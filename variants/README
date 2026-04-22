@@ -1,0 +1,112 @@
+## Pipeline Overview
+
+The full pipeline runs in the following order:
+
+```
+1. extract-datasets.py            — extract glycosites (predicted + experimental) and variants
+2. map-datasets.py                — map variants relative to glycosites
+3. run-binomial-test.py		  — run two-sided binomial test on relative positions 
+4. make-plotdata-binomial.py      — compute fold change and produce plots with binomial two-sided statistical significance stars
+
+```
+
+Step-1: extracting glycosite and variant datasets
+-------------------------------------------------
+This script extracts two types of datasets — glycosylation sites and missense variants — for use in downstream mapping and plotting analysis. It is run from the command line with options for species, dataset type, and release version.
+
+The glycosite extraction function produces two files which contain the experimentally verified glycosites and the predicted glycosites in GlyGen.  
+
+The variant extraction function creates one dataset which is separated into "germline" data which are nonsynonymous single-nucleotide variants (SNVs) from our germline variant dataset, and "somatic_cancer" data which are SNVs associated with cancer from the BioMuta Database.
+
+## Input files:
+The following dataset are expected in the directory:
+reviewed/human_protein_mutation_cancer_all.csv
+reviewed/human_protein_mutation_germline_all.csv
+reviewed/human_proteoform_glycosylation_sites_*.csv
+
+## Usage - run the following:
+$ python3 extract-datasets.py -d glycosites   #outputs --> /data/human_glycosites_experimental.csv and /data/human_glycosites_predicted.csv
+
+$ python3 extract-datasets.py -d variants   #outputs --> /data/human_variants_missense.csv
+
+
+Step-2: mapping glycosite and variant datasets 
+-----------------------------------------------
+Mapping script which finds all variant-site pairs where the variant falls within ±20 amino acids of a glycosylation site, then maps the relative position of that variant to the glycosylation site.
+
+## Input files:
+The following dataset are expected in the directory: 
+/data/human_glycosites_experimental.csv 
+/data/human_glycosites_predicted.csv
+/data/human_variants_missense.csv
+
+## Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -g GLYCOTYPE, --glycotype=GLYCOTYPE
+                        N-linked/O-linked
+  -v VARTYPE, --vartype=VARTYPE
+                        somatic_cancer/germline
+  -t SITETYPE, --sitetype=SITETYPE
+                        predicted/experimental
+
+## Usage:
+$ python3 map-datasets.py -g N-linked -v somatic_cancer -t predicted    #outputs --> /data/mapping.human.n_linked.somatic_cancer_predicted.csv
+
+$ python3 map-datasets.py -g O-linked -v germline -t experimental    #outputs --> /data/mapping.human.o_linked.germline_experimental.csv
+
+
+Step-3: binomial test 
+---------------------
+For each relative position in the mapping datasets, the script runs a two-sided binomial test to determine if the number of variants observed at each position are significantly different from what you'd expect by chance.
+
+## Input files:
+Precomputed mapping test results are expected in the directory with the naming convention:
+data/mapping.human.{glycotype}.{vartype}_{sitetype}.csv
+e.g. mapping.human.o_linked.germline_experimental.csv
+
+## Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -i INFILE, --infile=INFILE
+                        single mapping file to process
+  -a, --all             run binomial test on all mapping files in data/
+
+## Usage:
+To run the test on an individual dataset use:
+python3 run-binomial-test.py -i data/mapping.human.n_linked.germline_all_experimental.csv   #output --> /data/binomial_test.mapping.human.n_linked.germline_experimental.csv
+
+To run on all mapping datasets in the data folder use:
+python3 run-binomial-test.py -a
+
+
+Step-4: computes fold change and plots
+------------------------------------------------
+This script computes fold change statistics and produces plots from the mapping files. Each run produces a separate plot with positions +/−6 amino acids relative to either N-linked or O-linked predicted or experimental glycosylation sites, for both germline and somatic_cancer lines.
+
+## Significance Annotation
+The output is a p-value per position, which the plotting script then uses to add significance stars (*, **, ***) to the plot. Positions without a star show no significant deviation from the expected mutation rate.
+
+| Symbol | p-value threshold |
+|---|---|
+| `*` | p < 0.05 |
+| `**` | p < 0.01 |
+| `***` | p < 0.001 |
+
+## Input files:
+Precomputed binomial mapping results are expected in the directory with the naming convention:
+data/binomial_test.mapping.human.{glycotype}.{vartype}_{sitetype}.csv
+e.g. binomial_test.mapping.human.n_linked.somatic_cancer_all_experimental.csv
+
+## Options:
+  --version             show program's version number and exit
+  -h, --help            show this help message and exit
+  -g GLYCOTYPE, --glycotype=GLYCOTYPE
+                        N-linked/O-linked
+  -v VARTYPE, --vartype=VARTYPE
+                        all/somatic/germline
+  -t SITETYPE, --sitetype=SITETYPE
+                        predicted/experimental
+
+## Usage:
+python3 make-plotdata.py -g N-linked -v all -t experimental    #outputs --> /plots/plot.human.n_linked.all_experimental.png & /plots/plotdata.human.n_linked.all_experimental.json
