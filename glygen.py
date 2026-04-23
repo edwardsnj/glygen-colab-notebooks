@@ -69,7 +69,7 @@ class GlyGenDownloader(object):
             df = df[~df[colname].isna()]
         if asint is not None:
           for colname in asint:
-            df[colname] = df[colname].asint()
+            df[colname] = df[colname].astype(int)
         if setcolumn is not None:
           for k,v in setcolumn.items():
             df[k] = v
