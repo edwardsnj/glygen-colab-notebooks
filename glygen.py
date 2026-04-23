@@ -83,7 +83,7 @@ class GlyGenDownloader(object):
           df = df.drop_duplicates()
         dfs.append(df)
     df = pd.concat(dfs,ignore_index=True)
-    df.reset_index(inplace=True)
+    df.reset_index(inplace=True,drop=True)
     if dropcols is not None:
       df = df.drop(columns=dropcols)
     if dropdups:
