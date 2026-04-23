@@ -58,7 +58,8 @@ class GlyGenDownloader(object):
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,dropdups=False):
     dfs = []
     for fn in filenames:
-      fn = self.download(fn)
+      if not os.path.exists(fn):
+        fn = self.download(fn)
       for df in pd.read_csv(fn,usecols=usecols,chunksize=100000):
         if notna is not None:
           for colname in notna:
