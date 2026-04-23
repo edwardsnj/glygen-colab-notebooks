@@ -8,7 +8,7 @@ import pandas as pd
 
 class GlyGenDownloader(object):
   _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
-  _cache = ".glygen/"
+  _cache = ".glygen"
   
   def __init__(self,usecache=True,verbose=True):
     self.verbose = verbose
@@ -32,20 +32,25 @@ class GlyGenDownloader(object):
         fns.append(fns)
     return fns
 
-  def download(self,filename):
-    os.makedirs(self._cache)
-    if not self.usecache or not os.path.exists(self._cache + filename):
+  def download(self,filename,todir=None):
+    if todir is None:
+      todir = self._cache
+    else:
+      todir = todir.rstrip(os.sep)
+    todir += os.sep
+    os.makedirs(todir)
+    if not self.usecache or not os.path.exists(todir + filename):
       if self.verbose:
         print(f"Download {filename}...", end="")
-      if os.path.exists(self._cache + filename):
-        os.unlink(self._cache + filename)
-      urllib.urlretrieve(self._base + filename, self._cache + filename)
+      if os.path.exists(todir + filename):
+        os.unlink(todir + filename)
+      urllib.urlretrieve(self._base + filename, todir + filename)
       if self.verbose:
-        print(f" done ({self.file_size(self._cache + filename)}).")
+        print(f" done ({self.file_size(todir + filename)}).")
     else:
       if self.verbose:
-        print(f"Using cached {filename} ({self.file_size(self._cache + filename)}).")
-    return self._cache + filename
+        print(f"Using cached {filename} ({self.file_size(todir + filename)}).")
+    return todir + filename
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,dropdups=False):
     dfs = []
