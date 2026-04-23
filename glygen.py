@@ -55,7 +55,8 @@ class GlyGenDownloader(object):
         print(f"Using cached {filename} ({self.file_size(todir + filename)}).")
     return todir + filename
   
-  def dataframe(self,*filenames,usecols=None,notna=None,asint=None,dropdups=False):
+  def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
+                                setcolumn=None,dropdups=False):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -69,6 +70,8 @@ class GlyGenDownloader(object):
         if asint is not None:
           for colname in asint:
             df[colname] = df[colname].asint()
+        for k,v in setcolumn.items():
+          df[k] = v
         if dropdups:
           df = df.drop_duplicates()
         dfs.append(df)
