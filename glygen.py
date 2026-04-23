@@ -59,7 +59,7 @@ class GlyGenDownloader(object):
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
                                 setcolumn=None,transform=None,
-                                dropcols=None,dropdups=False):
+                                dropcols=None,dropdups=False,addfilename=False):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -76,6 +76,8 @@ class GlyGenDownloader(object):
         if setcolumn is not None:
           for k,v in setcolumn.items():
             df[k] = v
+        if addfilename:
+          df['filename'] = fn
         if transform is not None:
           for k,v in transform.items():
             df[k] = v(df)
