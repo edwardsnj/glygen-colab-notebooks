@@ -1,8 +1,13 @@
 
+import os, os.path
+import urllib
+import re
+
 import pandas as pd
 
+
 class GlyGenDownloader(object):
-  _base = GLYGEN_DATA_REVIEWED = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
+  _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
   _cache = ".glygen/"
   
   def __init__(self,usecache=True,verbose=True):
@@ -17,6 +22,16 @@ class GlyGenDownloader(object):
         size_bytes /= 1024
     return f"{size_bytes:.2f} PB"
   
+  def filenames(self,pattern,**kwargs):
+    fns = []
+    page = urllib.urlopen(self._base).read()
+    glob = pattern.format(kwargs)
+    for m in re.iterfind(r'<a href="([^"]*)">([^<]*)</a>'):
+      fn = m.group(2)
+      if fnmatch.fnmatch(fn,glob):
+        fns.append(fns)
+    return fns
+
   def download(self,filename):
     os.makedirs(self._cache)
     if not self.usecache or not os.path.exists(self._cache + filename):
