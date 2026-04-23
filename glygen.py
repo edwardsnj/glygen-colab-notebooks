@@ -30,12 +30,12 @@ class GlyGenDownloader(object):
     fns = []
     page = urllib.request.urlopen(self._base).read().decode()
     for m in self.anchorre.finditer(page):
-      fn = m.group(2)
+      fn = m.group(1).rsplit('/',1)[1]
       if fn.endswith('.stat.csv'):
         continue
       if fnmatch.fnmatch(fn,glob):
         fns.append(fn)
-    return fns
+    return sorted(fns)
 
   def download(self,filename,todir=None):
     if todir is None:
@@ -85,7 +85,9 @@ class GlyGenDownloader(object):
     if dropdups:
       df = df.drop_duplicates()
     if self.verbose:
+      print("Constructed data-frame:")
       df.info()
+      print()
     return df
 
 if __name__ == "__main__":
