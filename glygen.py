@@ -19,17 +19,17 @@ class GlyGenDownloader(object):
   
   def download(self,filename):
     os.makedirs(self._cache)
-    if not self.usecache or not os.path.exists(self._cache + filename)
+    if not self.usecache or not os.path.exists(self._cache + filename):
       if self.verbose:
         print(f"Download {filename}...", end="")
       if os.path.exists(self._cache + filename):
         os.unlink(self._cache + filename)
       urllib.urlretrieve(self._base + filename, self._cache + filename)
       if self.verbose:
-        print(f" done ({self.file_size(self._cache + filename}).")
+        print(f" done ({self.file_size(self._cache + filename)}).")
     else:
       if self.verbose:
-        print(f"Using cached {filename} ({self.file_size(self._cache + filename}).")
+        print(f"Using cached {filename} ({self.file_size(self._cache + filename)}).")
     return self._cache + filename
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,dropdups=False):
