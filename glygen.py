@@ -56,7 +56,7 @@ class GlyGenDownloader(object):
     return todir + filename
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
-                                setcolumn=None,dropdups=False):
+                                setcolumn=None,transform=None,dropdups=False):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -70,8 +70,12 @@ class GlyGenDownloader(object):
         if asint is not None:
           for colname in asint:
             df[colname] = df[colname].asint()
-        for k,v in setcolumn.items():
-          df[k] = v
+        if setcolumn is not None:
+          for k,v in setcolumn.items():
+            df[k] = v
+        if transform is not None:
+          for k,v in transform.items():
+            df[k] = v(df)
         if dropdups:
           df = df.drop_duplicates()
         dfs.append(df)
