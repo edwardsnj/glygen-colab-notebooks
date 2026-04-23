@@ -41,7 +41,7 @@ class GlyGenDownloader(object):
     else:
       todir = todir.rstrip(os.sep)
     todir += os.sep
-    os.makedirs(todir)
+    os.makedirs(todir,exist_ok=True)
     if not self.usecache or not os.path.exists(todir + filename):
       if self.verbose:
         print(f"Download {filename}...", end="")
