@@ -30,7 +30,7 @@ class GlyGenDownloader(object):
     fns = []
     page = urllib.request.urlopen(self._base).read().decode()
     for m in self.anchorre.finditer(page):
-      fn = m.group(1).rsplit('/',1)[1]
+      fn = m.group(1)
       if fn.endswith('.stat.csv'):
         continue
       if fnmatch.fnmatch(fn,glob):
