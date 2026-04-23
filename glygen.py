@@ -26,7 +26,7 @@ class GlyGenDownloader(object):
     fns = []
     page = urllib.request.urlopen(self._base).read()
     glob = pattern.format(**kwargs)
-    for m in re.iterfind(r'<a href="([^"]*)">([^<]*)</a>'):
+    for m in re.finditer(r'<a href="([^"]*)">([^<]*)</a>'):
       fn = m.group(2)
       if fnmatch.fnmatch(fn,glob):
         fns.append(fns)
