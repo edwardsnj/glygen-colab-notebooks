@@ -58,7 +58,8 @@ class GlyGenDownloader(object):
     return todir + filename
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
-                                setcolumn=None,transform=None,dropdups=False):
+                                setcolumn=None,transform=None,
+                                dropcols=None,dropdups=False):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -82,6 +83,8 @@ class GlyGenDownloader(object):
           df = df.drop_duplicates()
         dfs.append(df)
     df = pd.concat(dfs,ignore_index=True)
+    if dropcols is not None:
+      df = df.drop(dropcols)
     if dropdups:
       df = df.drop_duplicates()
     if self.verbose:
