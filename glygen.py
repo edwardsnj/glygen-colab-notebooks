@@ -1,7 +1,7 @@
 
 import os, os.path
-import urllib
-import re
+import urllib.request
+import re, fnmatch
 
 import pandas as pd
 
@@ -28,11 +28,11 @@ class GlyGenDownloader(object):
     glob = pattern.format(**kwargs)
 
     fns = []
-    page = urllib.request.urlopen(self._base).read()
+    page = urllib.request.urlopen(self._base).read().decode()
     for m in self.anchorre.finditer(page):
       fn = m.group(2)
       if fnmatch.fnmatch(fn,glob):
-        fns.append(fns)
+        fns.append(fn)
     return fns
 
   def download(self,filename,todir=None):
@@ -74,5 +74,12 @@ class GlyGenDownloader(object):
       df = df.drop_duplicates()
     return df
 
-    
+if __name__ == "__main__":
+
+  ggdl = GlyGenDownloader()
+
+  site_files = ggdl.filenames("{species}_proteoform_glycosylation_sites_*.csv",species="human")
+
+  print(site_files)
+
     
