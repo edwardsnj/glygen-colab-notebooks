@@ -44,7 +44,7 @@ class GlyGenDownloader(object):
         print(f"Download {filename}...", end="")
       if os.path.exists(todir + filename):
         os.unlink(todir + filename)
-      urllib.urlretrieve(self._base + filename, todir + filename)
+      urllib.request.urlretrieve(self._base + filename, todir + filename)
       if self.verbose:
         print(f" done ({self.file_size(todir + filename)}).")
     else:
