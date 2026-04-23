@@ -1,1 +1,1 @@
-from . glygen import *
+from glygen import *
