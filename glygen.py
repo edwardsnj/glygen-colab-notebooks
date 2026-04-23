@@ -57,6 +57,8 @@ class GlyGenDownloader(object):
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,dropdups=False):
     dfs = []
+    if isinstance(filenames[0],list) and len(filenames) == 1:
+      filenames = filenames[0]
     for fn in filenames:
       if not os.path.exists(fn):
         fn = self.download(fn)
