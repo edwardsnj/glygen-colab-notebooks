@@ -29,7 +29,7 @@ class GlyGenDownloader(object):
 
     fns = []
     page = urllib.request.urlopen(self._base).read()
-    for m in anchorre.finditer(page):
+    for m in self.anchorre.finditer(page):
       fn = m.group(2)
       if fnmatch.fnmatch(fn,glob):
         fns.append(fns)
