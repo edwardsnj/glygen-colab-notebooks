@@ -22,11 +22,14 @@ class GlyGenDownloader(object):
         size_bytes /= 1024
     return f"{size_bytes:.2f} PB"
   
+  anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
+
   def filenames(self,pattern,**kwargs):
+    glob = pattern.format(**kwargs)
+
     fns = []
     page = urllib.request.urlopen(self._base).read()
-    glob = pattern.format(**kwargs)
-    for m in re.finditer(r'<a href="([^"]*)">([^<]*)</a>'):
+    for m in anchorre.finditer(page):
       fn = m.group(2)
       if fnmatch.fnmatch(fn,glob):
         fns.append(fns)
