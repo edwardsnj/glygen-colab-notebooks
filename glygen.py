@@ -84,6 +84,8 @@ class GlyGenDownloader(object):
     df = pd.concat(dfs,ignore_index=True)
     if dropdups:
       df = df.drop_duplicates()
+    if self.verbose:
+      df.info()
     return df
 
 if __name__ == "__main__":
