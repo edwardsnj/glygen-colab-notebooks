@@ -77,7 +77,7 @@ class GlyGenDownloader(object):
           for k,v in setcolumn.items():
             df[k] = v
         if addfilename:
-          df['filename'] = fn
+          df['filename'] = os.path.split(fn)[1]
         if transform is not None:
           for k,v in transform.items():
             df[k] = v(df)
