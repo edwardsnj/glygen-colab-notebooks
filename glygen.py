@@ -15,7 +15,7 @@ class GlyGenDownloader(object):
     self.usecache = usecache
 
   def file_size(self,filename,units=None):
-    size_bytes = os.path.getsize(path)
+    size_bytes = os.path.getsize(filename)
     for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
         if (size_bytes < 1024 and units is None) or (unit == units):
             return f"{size_bytes:.2f} {unit}"
