@@ -60,7 +60,8 @@ class GlyGenDownloader(object):
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
                                 setcolumn=None,transform=None,
                                 dropcols=None,dropdups=False,
-                                addfilename=False):
+                                addfilename=False,
+                                filterrows=None):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -82,6 +83,9 @@ class GlyGenDownloader(object):
         if transform is not None:
           for k,v in transform.items():
             df[k] = v(df)
+        if filterrows is not None:
+          for f in filterrows:
+            df = df[f(df)]
         if dropdups:
           df = df.drop_duplicates()
         dfs.append(df)
