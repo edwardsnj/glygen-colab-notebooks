@@ -45,6 +45,8 @@ def run_binomial_test(in_file):
         count_dict[rel_pos] += 1
         N += 1
 
+    print(count_dict)
+    print(len(count_dict.keys()))
     p = 1.0 / float(len(count_dict.keys()))
 
     file_name = os.path.basename(in_file)
