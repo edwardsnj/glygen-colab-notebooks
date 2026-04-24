@@ -59,7 +59,8 @@ class GlyGenDownloader(object):
   
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
                                 setcolumn=None,transform=None,
-                                dropcols=None,dropdups=False,addfilename=False):
+                                dropcols=None,dropdups=False,
+                                addfilename=False):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -91,10 +92,22 @@ class GlyGenDownloader(object):
     if dropdups:
       df = df.drop_duplicates()
     if self.verbose:
-      print("Constructed data-frame:")
+      print("Constructed data-frame:\n")
       df.info()
       print()
     return df
+
+  def cached_dataframe(name,*filenames,**kwargs):
+    filename = os.path.join(self._cache,"_" + name + ".csv")
+    if os.path.exists(filename):
+      print(f"Reading cached data-frame {name}...", end="")
+      df = pd.read_csv(filename)
+      print(f"done. ({df.shape[0]} rows)\n")
+      df.info()
+      print()
+    else:
+      df = self.dataframe(*filenames,**kwargs)
+    return df 
 
 if __name__ == "__main__":
 
