@@ -107,6 +107,7 @@ class GlyGenDownloader(object):
       print()
     else:
       df = self.dataframe(*filenames,**kwargs)
+      df.to_csv(filename,index=False)
     return df 
 
 if __name__ == "__main__":
