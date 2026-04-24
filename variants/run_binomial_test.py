@@ -36,6 +36,7 @@ def run_binomial_test(in_file):
 
     print("Processing: %s" % in_file)
     map_dict = load_map_dict(in_file)
+    print(map_dict)
     count_dict = {}
     N = 0
     for cmb in map_dict:
