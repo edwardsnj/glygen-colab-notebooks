@@ -5,7 +5,7 @@ import re, fnmatch
 
 import pandas as pd
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 class GlyGenDownloader(object):
   _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
@@ -56,7 +56,7 @@ class GlyGenDownloader(object):
       if exclude is not None:
         match = False
         for gl in exclude:
-          if fnmatch.fnmatch(fn,gl):
+          if fn == gl or fnmatch.fnmatch(fn,gl):
             match = True
             break
         if match:
