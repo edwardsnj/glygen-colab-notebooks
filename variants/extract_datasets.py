@@ -69,10 +69,13 @@ def extract_glyco_sites():
                         newrow = [canon, str(start_pos), start_aa, g_type]
                         FW_exp.write("\"%s\"\n" % ("\",\"".join(newrow)))
                     tmp_dict_exp[site] = True
+    print("Experimental sites found:",len(tmp_dict_exp))
+    print("Predicted sites found:",len(tmp_dict_pred))
 
     # ── UniProtKB file: first pass to find experimentally supported sites ─────
     print("\n=== UNIPROTKB FILE ===")
     uniprotkb_exp_sites = set()
+    uniprotkb_pred_sites = set()
     if os.path.exists(uniprotkb_file):
         print("FOUND: %s" % uniprotkb_file)
         with open(uniprotkb_file, "r") as FR:
@@ -93,7 +96,12 @@ def extract_glyco_sites():
                 if xref_key.find("_xref_pubmed") != -1 or xref_key.find("_xref_doi") != -1:
                     site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
                     uniprotkb_exp_sites.add(site)
+                else:
+                    site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
+                    uniprotkb_pred_sites.add(site)
+        
         print("UniProtKB experimental sites found: %s" % len(uniprotkb_exp_sites))
+        print("UniProtKB predicted sites found: %s" % len(uniprotkb_pred_sites))
 
         # ── UniProtKB file: second pass to write to exp or pred ──────────────
         with open(uniprotkb_file, "r") as FR:
