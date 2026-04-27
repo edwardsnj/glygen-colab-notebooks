@@ -36,7 +36,7 @@ def run_binomial_test(in_file):
 
     print("Processing: %s" % in_file)
     map_dict = load_map_dict(in_file)
-    print(map_dict)
+
     count_dict = {}
     N = 0
     for cmb in map_dict:
@@ -46,8 +46,10 @@ def run_binomial_test(in_file):
         count_dict[rel_pos] += 1
         N += 1
 
-    print(count_dict)
-    print(len(count_dict.keys()))
+    for k,v in sorted(count_dict.items()):
+        print(k,v)
+    print("N",N)
+    
     p = 1.0 / float(len(count_dict.keys()))
 
     file_name = os.path.basename(in_file)

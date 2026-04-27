@@ -78,11 +78,9 @@ def main():
 
     in_file = os.path.join(DATA_DIR, "human_glycosites_%s.csv" % options.sitetype)
     site_dict = load_site_dict(in_file, glyco_type)
-    print(len(site_dict))
 
     in_file = os.path.join(DATA_DIR, "human_variants_missense.csv")
     var_dict = load_var_dict(in_file, v_type)
-    print(len(var_dict))
 
     gt = glyco_type.lower().replace("-", "_")
 
