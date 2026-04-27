@@ -5,7 +5,7 @@ import re, fnmatch
 
 import pandas as pd
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
 class GlyGenDownloader(object):
   _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
@@ -85,7 +85,7 @@ class GlyGenDownloader(object):
         print(f"Using cached {filename} ({self.file_size(todir + filename)}).")
     return todir + filename
   
-  def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
+  def _dataframe(self,*filenames,usecols=None,notna=None,asint=None,
                                 setcolumn=None,transform=None,
                                 dropcols=None,dropdups=False,
                                 addfilename=False,addspecies=False,
@@ -137,7 +137,11 @@ class GlyGenDownloader(object):
       print()
     return df
 
-  def cached_dataframe(self,name,*filenames,**kwargs):
+  def dataframe(self,*filenames,**kwargs):
+    if "name" not in kwargs:
+      return self._dataframe(*filenames,**kwargs)
+    name = kwargs["name"]
+    del kwargs["name"]
     filename = os.path.join(self._cache,"_" + name + ".csv")
     if os.path.exists(filename):
       print(f"Reading cached data-frame {name}...", end="")
@@ -146,7 +150,7 @@ class GlyGenDownloader(object):
       df.info()
       print()
     else:
-      df = self.dataframe(*filenames,**kwargs)
+      df = self._dataframe(*filenames,**kwargs)
       df.to_csv(filename,index=False)
     return df 
 
