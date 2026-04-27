@@ -10,6 +10,25 @@ class GlyGenDownloader(object):
   _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
   _cache = ".glygen"
   
+  glygentaxid = {
+    "human": 9606,
+    "mouse": 10090,
+    "rat": 10116,
+    "arabidopsis": 3702,
+    "bovine": 9913,
+    "chicken": 9031,
+    "dicty": 44689,
+    "fruitfly": 7227,
+    "hamster": 10029,
+    "hcv1a": 11108,
+    "hcv1b": 11116,
+    "pig": 9823,
+    "sarscov1": 694009,
+    "sarscov2": 2697049,
+    "yeast": 4932,
+    "zebrafish": 7955,
+  }
+
   def __init__(self,usecache=True,verbose=True):
     self.verbose = verbose
     self.usecache = usecache
@@ -60,8 +79,8 @@ class GlyGenDownloader(object):
   def dataframe(self,*filenames,usecols=None,notna=None,asint=None,
                                 setcolumn=None,transform=None,
                                 dropcols=None,dropdups=False,
-                                addfilename=False,
-                                filterrows=None):
+                                addfilename=False,addspecies=False,
+                                addtaxid=False,filterrows=None):
     dfs = []
     if isinstance(filenames[0],list) and len(filenames) == 1:
       filenames = filenames[0]
@@ -78,8 +97,16 @@ class GlyGenDownloader(object):
         if setcolumn is not None:
           for k,v in setcolumn.items():
             df[k] = v
+        filename = os.path.split(fn)[1]
+        species = os.path.split(fn)[1].split("_",1)[0]
         if addfilename:
           df['filename'] = os.path.split(fn)[1]
+        if addspecies:
+          if species in self.glygentaxid:
+            df['species'] = species
+        if addtaxid:
+          if species in self.glygentaxid:
+            df['taxid'] = self.glygentaxid[species]
         if transform is not None:
           for k,v in transform.items():
             df[k] = v(df)
