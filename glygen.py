@@ -5,7 +5,7 @@ import re, fnmatch
 
 import pandas as pd
 
-__version__ = "1.0.0'
+__version__ = "1.0.0"
 
 class GlyGenDownloader(object):
   _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
