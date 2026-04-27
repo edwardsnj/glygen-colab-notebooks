@@ -44,15 +44,23 @@ class GlyGenDownloader(object):
   
   anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
 
-  def filenames(self,pattern,**kwargs):
+  def filenames(self,pattern,exclude=None,**kwargs):
     glob = pattern.format(**kwargs)
-
+    
     fns = []
     page = urllib.request.urlopen(self._base).read().decode()
     for m in self.anchorre.finditer(page):
       fn = m.group(1)
       if fn.endswith('.stat.csv'):
         continue
+      if exclude is not None:
+        match = False
+        for gl in exclude:
+          if fnmatch.fnmatch(fn,gl):
+            match = True
+            break
+        if match:
+          continue
       if fnmatch.fnmatch(fn,glob):
         fns.append(fn)
     return sorted(fns)
