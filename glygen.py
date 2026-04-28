@@ -142,16 +142,18 @@ class GlyGenDownloader(object):
       return self._dataframe(*filenames,**kwargs)
     name = kwargs["name"]
     del kwargs["name"]
-    filename = os.path.join(self._cache,"_dataframe_" + name + ".csv")
+    filename = os.path.join(self._cache,"_dataframe_" + name + ".fth")
     if os.path.exists(filename) and not kwargs.get('force',False):
       print(f"Reading cached data-frame {name}...", end="")
-      df = pd.read_csv(filename)
+      df = pd.read_feature(filename)
       print(f"done. ({df.shape[0]} rows)\n")
       df.info()
       print()
     else:
       df = self._dataframe(*filenames,**kwargs)
-      df.to_csv(filename,index=False)
+      print(f"Writing data-frame {name} to cache...", end="")
+      df.to_feather(filename,index=False)
+      print(f"done. ({df.shape[0]} rows)\n")
     return df 
 
 if __name__ == "__main__":
