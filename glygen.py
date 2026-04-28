@@ -142,8 +142,8 @@ class GlyGenDownloader(object):
       return self._dataframe(*filenames,**kwargs)
     name = kwargs["name"]
     del kwargs["name"]
-    filename = os.path.join(self._cache,"_" + name + ".csv")
-    if os.path.exists(filename):
+    filename = os.path.join(self._cache,"_dataframe_" + name + ".csv")
+    if os.path.exists(filename) and not kwargs.get('force',False):
       print(f"Reading cached data-frame {name}...", end="")
       df = pd.read_csv(filename)
       print(f"done. ({df.shape[0]} rows)\n")
