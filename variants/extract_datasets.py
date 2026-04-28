@@ -101,8 +101,9 @@ def extract_glyco_sites():
                     uniprotkb_pred_sites.add(site)
         
         print("UniProtKB experimental sites found: %s" % len(uniprotkb_exp_sites))
-        print("UniProtKB predicted sites found: %s" % len(uniprotkb_pred_sites))
 
+        num_uniprotkb_exp_sites = 0
+        num_uniprotkb_pred_sites = 0
         # ── UniProtKB file: second pass to write to exp or pred ──────────────
         with open(uniprotkb_file, "r") as FR:
             f_list, idx = [], 0
@@ -123,16 +124,20 @@ def extract_glyco_sites():
                     if site not in tmp_dict_exp:
                         newrow = [canon, str(start_pos), start_aa, g_type]
                         FW_exp.write("\"%s\"\n" % ("\",\"".join(newrow)))
+                        num_uniprotkb_exp_sites += 1
                     tmp_dict_exp[site] = True
                 else:
                     if site not in tmp_dict_pred:
                         newrow = [canon, str(start_pos), start_aa, g_type]
                         FW_pred.write("\"%s\"\n" % ("\",\"".join(newrow)))
+                        num_uniprotkb_pred_sites += 1
                     tmp_dict_pred[site] = True
     else:
         print("NOT FOUND: %s" % uniprotkb_file)
 
     print("\n=== SUMMARY ===")
+    print("UniProtKB experimental sites written: %s" % num_uniprotkb_exp_sites)
+    print("UniProtKB predicted sites written: %s" % num_uniprotkb_exp_sites)
     print("Total experimental sites written: %s" % len(tmp_dict_exp))
     print("Total predicted sites written: %s" % len(tmp_dict_pred))
 
