@@ -154,7 +154,7 @@ class GlyGenDownloader(object):
         del kwargs['force']
       df = self._dataframe(*filenames,**kwargs)
       print(f"Writing data-frame {name} to cache...", end="")
-      df.to_feather(filename,index=False)
+      df.to_feather(filename)
       print(f"done. ({df.shape[0]} rows)\n")
     return df 
 
