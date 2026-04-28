@@ -145,7 +145,7 @@ class GlyGenDownloader(object):
     filename = os.path.join(self._cache,"_dataframe_" + name + ".fth")
     if os.path.exists(filename) and not kwargs.get('force',False):
       print(f"Reading cached data-frame {name}...", end="")
-      df = pd.read_feature(filename)
+      df = pd.read_feather(filename)
       print(f"done. ({df.shape[0]} rows)\n")
       df.info()
       print()
