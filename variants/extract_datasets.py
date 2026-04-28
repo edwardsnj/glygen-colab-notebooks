@@ -137,7 +137,7 @@ def extract_glyco_sites():
 
     print("\n=== SUMMARY ===")
     print("UniProtKB experimental sites written: %s" % num_uniprotkb_exp_sites)
-    print("UniProtKB predicted sites written: %s" % num_uniprotkb_exp_sites)
+    print("UniProtKB predicted sites written: %s" % num_uniprotkb_pred_sites)
     print("Total experimental sites written: %s" % len(tmp_dict_exp))
     print("Total predicted sites written: %s" % len(tmp_dict_pred))
 
