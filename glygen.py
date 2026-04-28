@@ -150,6 +150,8 @@ class GlyGenDownloader(object):
       df.info()
       print()
     else:
+      if 'force' in kwargs:
+        del kwargs['force']
       df = self._dataframe(*filenames,**kwargs)
       print(f"Writing data-frame {name} to cache...", end="")
       df.to_feather(filename,index=False)
