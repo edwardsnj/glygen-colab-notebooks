@@ -45,10 +45,6 @@ def run_binomial_test(in_file):
             count_dict[rel_pos] = 0
         count_dict[rel_pos] += 1
         N += 1
-
-    for k,v in sorted(count_dict.items()):
-        print(k,v)
-    print("N",N)
     
     p = 1.0 / float(len(count_dict.keys()))
 

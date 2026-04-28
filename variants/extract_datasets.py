@@ -101,7 +101,7 @@ def extract_glyco_sites():
                     uniprotkb_pred_sites.add(site)
         
         print("UniProtKB experimental sites found: %s" % len(uniprotkb_exp_sites))
-        print("UniProtKB predicted sites found: %s" % len(uniprotkb_pred_sites))
+        # print("UniProtKB predicted sites found: %s" % len(uniprotkb_pred_sites))
 
         # ── UniProtKB file: second pass to write to exp or pred ──────────────
         with open(uniprotkb_file, "r") as FR:
