@@ -7,3 +7,9 @@ Uses the Python module [glygen.py](../../blob/main/glygen.py) to help with selec
 ## 1. N-linked Glycosylation Sites annotated by UniProtKB with a PubMed ID
 
 Python [notebook](../../blob/main/uniprotkb_nlinked_sites.ipynb) for Google Colab.
+
+## 2. Bias in Germline Variants near N-linked Glycosylation Sites
+
+Python [notebook](../../blob/main/variants.ipynb) for Google Colab.
+
+See also: Original [scripts](../../blob/main/variants_original.ipynb) run in the Google Colab environment.
