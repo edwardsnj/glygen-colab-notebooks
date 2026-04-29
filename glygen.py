@@ -238,7 +238,7 @@ class GlyGenDownloader(object):
         It provides a rich interface to apply lambdas and caching.
 
         Args:
-            *filenames (str or list): One or more filenames/paths to load and merge.
+            filenames (str or list): One or more filenames/paths to load and merge.
             name (str, optional): A unique alias for this DataFrame construction. If provided, 
                                   the processed DataFrame will be saved to disk as a `.fth` 
                                   (Feather) cache file, speeding up future runs immensely.
