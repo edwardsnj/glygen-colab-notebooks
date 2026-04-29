@@ -350,4 +350,3 @@ if __name__ == "__main__":
     print("\n--- 4. Final Summaries ---")
     print(f"Experimental Sites Shape: {glyco_site_exp.shape}")
     print(f"UniProtKB Sites Shape: {glyco_site_uniprotkb.shape}")
-    print("\nDemonstration complete!")
