@@ -64,11 +64,11 @@ High-level API to build a cleaned, processed DataFrame from a list of files.  It
  - <b>`usecols`</b> (list, optional):  Columns to extract from the source CSV. 
  - <b>`notna`</b> (list, optional):  Columns that must not contain NaN values (rows dropped). 
  - <b>`asint`</b> (list, optional):  Columns to cast as integers. 
- - <b>`setcolumn`</b> (dict, optional):  Static columns to inject (e.g., {"predicted": False}). 
- - <b>`transform`</b> (dict, optional):  Complex derivations passed as {column_name: callable(df)}. (e.g. {"dstatus": lambda df: ~df["do_name"].isna()}) 
+ - <b>`setcolumn`</b> (dict, optional):  Static columns to inject (e.g., `{"predicted": False}`). 
+ - <b>`transform`</b> (dict, optional):  Complex derivations passed as `{column_name: callable(df)}`. (e.g. `{"dstatus": lambda df: ~df["do_name"].isna()}`) 
  - <b>`filterrows`</b> (list of callables, optional):  Condition functions to subset the data. 
  - <b>`dropcols`</b> (list, optional):  Columns to discard at the very end of processing. 
- - <b>`dropdups`</b> (bool, optional):  If True, applies DataFrame.drop_duplicates(). 
+ - <b>`dropdups`</b> (bool, optional):  If True, applies `DataFrame.drop_duplicates()`. 
  - <b>`addfilename`</b> (bool, optional):  If True, appends the source filename as a column. 
  - <b>`addspecies`</b> (bool, optional):  If True, appends the inferred species as a column. 
  - <b>`addtaxid`</b> (bool, optional):  If True, appends the species taxid as a column. 
@@ -120,9 +120,9 @@ Retrieves a list of filenames available on the GlyGen server that match a specif
 
 **Args:**
  
- - <b>`pattern`</b> (str):  A string formatting pattern or direct glob pattern to match (e.g., "{species}_proteoform*"). 
+ - <b>`pattern`</b> (str):  A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`). 
  - <b>`exclude`</b> (list of str, optional):  Glob patterns to exclude from the results. 
- - <b>`**kwargs`</b>:  Format arguments injected into the `pattern` string (e.g., species="human"). 
+ - <b>`**kwargs`</b>:  Format arguments injected into the `pattern` string (e.g., `species="human"`). 
 
 
 
