@@ -19,6 +19,7 @@ import sys
 import urllib.request
 import re
 import fnmatch
+import shutil
 import pandas as pd
 
 __version__ = "1.1.0"
@@ -52,16 +53,21 @@ class GlyGenDownloader(object):
         "zebrafish": 7955,
     }
 
-    def __init__(self, usecache=True, verbose=True):
+    def __init__(self, usecache=True, clearcache=False, maxcacheage=24*3600, verbose=True):
         """
         Initialize the GlyGenDownloader.
 
         Args:
             usecache (bool): If True, avoids re-downloading files that exist in the cache directory.
+            clearcache (bool): If True, clear the cache upon initialization.
+            maxcacheage (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
             verbose (bool): If True, prints download progress and dataframe summaries.
         """
         self.verbose = verbose
         self.usecache = usecache
+        self.maxcacheage = maxcacheage
+        if clearcache:
+            shutil.rmtree(self._cache)
 
     def _file_size(self, filename, units=None):
         """
@@ -267,7 +273,7 @@ class GlyGenDownloader(object):
             
         filename = os.path.join(self._cache, f"_dataframe_{name}.fth")
         
-        if os.path.exists(filename) and not force:
+        if os.path.exists(filename) and self.usecache and not force:
             print(f"Reading cached data-frame {name}...", end="", file=sys.stderr, flush=True)
             df = pd.read_feather(filename)
             print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
@@ -277,9 +283,10 @@ class GlyGenDownloader(object):
                 print(file=sys.stderr, flush=True)
         else:
             df = self._dataframe(*filenames, **kwargs)
-            print(f"Writing data-frame {name} to cache...", end="", file=sys.stderr, flush=True)
-            df.to_feather(filename)
-            print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+            if self.usecache:
+                print(f"Writing data-frame {name} to cache...", end="", file=sys.stderr, flush=True)
+                df.to_feather(filename)
+                print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
         return df
 
