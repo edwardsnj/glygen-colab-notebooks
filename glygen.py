@@ -21,9 +21,9 @@ import re
 import fnmatch
 import pandas as pd
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
-class GlyGenDownloader:
+class GlyGenDownloader(object):
     """
     A utility to discover, download, cache, and load datasets from the GlyGen data repository 
     into pandas DataFrames seamlessly.
