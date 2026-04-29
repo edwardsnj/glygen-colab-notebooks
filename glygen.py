@@ -29,9 +29,12 @@ class GlyGenDownloader(object):
     into pandas DataFrames seamlessly.
         
     Public Methods:
-        filenames(pattern, exclude=None, **kwargs): Retrieves a list of available filenames matching a pattern.
-        download(filename, todir=None): Downloads a specific file from the repository to local cache.
-        dataframe(*filenames, **kwargs): High-level API to build a cleaned, processed DataFrame from a list of files.
+
+        `filenames(pattern, exclude=None, **kwargs)`: Retrieves a list of available filenames matching a pattern.
+    
+        `download(filename, todir=None)`: Downloads a specific file from the repository to local cache.
+    
+        `dataframe(*filenames, **kwargs)`: High-level API to build a cleaned, processed DataFrame from a list of files.
     """
     
     _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
