@@ -232,7 +232,7 @@ class GlyGenDownloader(object):
             df = df.drop_duplicates()
             
         if self.verbose:
-            print("Constructed data-frame:\n", file=sys.stderr, flush=True)
+            print("Constructed dataframe:\n", file=sys.stderr, flush=True)
             df.info(buf=sys.stderr)
             print(file=sys.stderr, flush=True)
             
@@ -274,7 +274,7 @@ class GlyGenDownloader(object):
         filename = os.path.join(self._cache, f"_dataframe_{name}.fth")
         
         if os.path.exists(filename) and self.usecache and not force:
-            print(f"Reading cached data-frame {name}...", end="", file=sys.stderr, flush=True)
+            print(f"Reading cached dataframe {name}...", end="", file=sys.stderr, flush=True)
             df = pd.read_feather(filename)
             print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
@@ -284,7 +284,7 @@ class GlyGenDownloader(object):
         else:
             df = self._dataframe(*filenames, **kwargs)
             if self.usecache:
-                print(f"Writing data-frame {name} to cache...", end="", file=sys.stderr, flush=True)
+                print(f"Writing dataframe {name} to cache...", end="", file=sys.stderr, flush=True)
                 df.to_feather(filename)
                 print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
