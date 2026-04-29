@@ -1,135 +1,135 @@
-# Table of Contents
 
-* [glygen](#glygen)
-  * [GlyGenDownloader](#glygen.GlyGenDownloader)
-    * [\_\_init\_\_](#glygen.GlyGenDownloader.__init__)
-    * [filenames](#glygen.GlyGenDownloader.filenames)
-    * [download](#glygen.GlyGenDownloader.download)
-    * [dataframe](#glygen.GlyGenDownloader.dataframe)
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/devel/glygen.py#L0"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-<a id="glygen"></a>
+# <kbd>module</kbd> `glygen.py`
+GlyGen Data Utilities 
 
-# glygen
+This module provides utilities to discover, download, cache, and process  datasets from the GlyGen data repository (data.glygen.org). It is designed  specifically for data science workflows, enabling the seamless conversion of  remote CSV files into clean, filtered, and typed pandas DataFrames. 
 
-GlyGen Data Utilities
+Features include: 
+- Automatic remote file discovery via glob patterns. 
+- Local caching of downloaded files. 
+- Memory-efficient processing using chunked reading. 
+- Dynamic data transformations, filtering, and static column injections. 
+- Intermediate DataFrame caching (via Feather format) for rapid reloading. 
 
-This module provides utilities to discover, download, cache, and process 
-datasets from the GlyGen data repository (data.glygen.org). It is designed 
-specifically for data science workflows, enabling the seamless conversion of 
-remote CSV files into clean, filtered, and typed pandas DataFrames.
 
-Features include:
-- Automatic remote file discovery via glob patterns.
-- Local caching of downloaded files.
-- Memory-efficient processing using chunked reading.
-- Dynamic data transformations, filtering, and static column injections.
-- Intermediate DataFrame caching (via Feather format) for rapid reloading.
 
-<a id="glygen.GlyGenDownloader"></a>
+---
 
-## GlyGenDownloader Objects
+## <kbd>class</kbd> `GlyGenDownloader`
+A utility to discover, download, cache, and load datasets from the GlyGen data repository  into pandas DataFrames seamlessly.  
+
+Public Methods:  filenames(pattern, exclude=None, **kwargs): Retrieves a list of available filenames matching a pattern.  download(filename, todir=None): Downloads a specific file from the repository to local cache.  dataframe(*filenames, **kwargs): High-level API to build a cleaned, processed DataFrame from a list of files. 
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/devel/glygen.py#L60"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `__init__`
 
 ```python
-class GlyGenDownloader(object)
+__init__(usecache=True, verbose=True)
 ```
 
-A utility to discover, download, cache, and load datasets from the GlyGen data repository
-into pandas DataFrames seamlessly.
+Initialize the GlyGenDownloader. 
 
-Public Methods:
-filenames(pattern, exclude=None, **kwargs): Retrieves a list of available filenames matching a pattern.
-download(filename, todir=None): Downloads a specific file from the repository to local cache.
-dataframe(*filenames, **kwargs): High-level API to build a cleaned, processed DataFrame from a list of files.
 
-<a id="glygen.GlyGenDownloader.__init__"></a>
 
-#### \_\_init\_\_
+**Args:**
+ 
+ - <b>`usecache`</b> (bool):  If True, avoids re-downloading files that exist in the cache directory. 
+ - <b>`verbose`</b> (bool):  If True, prints download progress and dataframe summaries. 
+
+
+
+
+---
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/devel/glygen.py#L240"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `dataframe`
 
 ```python
-def __init__(usecache=True, verbose=True)
+dataframe(*filenames, **kwargs)
 ```
 
-Initialize the GlyGenDownloader.
+High-level API to build a cleaned, processed DataFrame from a list of files.  It provides a rich interface to apply lambdas and caching. 
 
-**Arguments**:
 
-- `usecache` _bool_ - If True, avoids re-downloading files that exist in the cache directory.
-- `verbose` _bool_ - If True, prints download progress and dataframe summaries.
 
-<a id="glygen.GlyGenDownloader.filenames"></a>
+**Args:**
+ 
+ - <b>`*filenames (str or list)`</b>:  One or more filenames/paths to load and merge. 
+ - <b>`name`</b> (str, optional):  A unique alias for this DataFrame construction. If provided,   the processed DataFrame will be saved to disk as a `.fth`   (Feather) cache file, speeding up future runs immensely. 
+ - <b>`force`</b> (bool, optional):  If True, ignores the `.fth` Feather cache and reconstructs the data. 
+ - <b>`usecols`</b> (list, optional):  Columns to extract from the source CSV. 
+ - <b>`notna`</b> (list, optional):  Columns that must not contain NaN values (rows dropped). 
+ - <b>`asint`</b> (list, optional):  Columns to cast as integers. 
+ - <b>`setcolumn`</b> (dict, optional):  Static columns to inject (e.g., {"predicted": False}). 
+ - <b>`transform`</b> (dict, optional):  Complex derivations passed as {column_name: callable(df)}. 
+ - <b>`(e.g. {"dstatus"`</b>:  lambda df: ~df["do_name"].isna()}). 
+ - <b>`filterrows`</b> (list of callables, optional):  Condition functions to subset the data. 
+ - <b>`dropcols`</b> (list, optional):  Columns to discard at the very end of processing. 
+ - <b>`dropdups`</b> (bool, optional):  If True, applies DataFrame.drop_duplicates(). 
+ - <b>`addfilename`</b> (bool, optional):  If True, appends the source filename as a column. 
+ - <b>`addspecies`</b> (bool, optional):  If True, appends the inferred species as a column. 
+ - <b>`addtaxid`</b> (bool, optional):  If True, appends the species taxid as a column. 
 
-#### filenames
+
+
+**Returns:**
+ 
+ - <b>`pd.DataFrame`</b>:  The finalized pandas DataFrame. 
+
+---
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/devel/glygen.py#L125"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `download`
 
 ```python
-def filenames(pattern, exclude=None, **kwargs)
+download(filename, todir=None)
 ```
 
-Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+Downloads a specific file from the GlyGen repository to a local cache directory. 
 
-**Arguments**:
 
-- `pattern` _str_ - A string formatting pattern or direct glob pattern to match (e.g., "{species}_proteoform*").
-- `exclude` _list of str, optional_ - Glob patterns to exclude from the results.
-- `**kwargs` - Format arguments injected into the `pattern` string (e.g., species="human").
-  
 
-**Returns**:
+**Args:**
+ 
+ - <b>`filename`</b> (str):  The name of the file to download. 
+ - <b>`todir`</b> (str, optional):  The target directory. Defaults to the `_cache` class attribute. 
 
-- `list` - Alphabetically sorted list of matching filenames from the server.
 
-<a id="glygen.GlyGenDownloader.download"></a>
 
-#### download
+**Returns:**
+ 
+ - <b>`str`</b>:  The local filepath of the downloaded (or cached) file. 
+
+---
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/devel/glygen.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>function</kbd> `filenames`
 
 ```python
-def download(filename, todir=None)
+filenames(pattern, exclude=None, **kwargs)
 ```
 
-Downloads a specific file from the GlyGen repository to a local cache directory.
+Retrieves a list of filenames available on the GlyGen server that match a specific pattern. 
 
-**Arguments**:
 
-- `filename` _str_ - The name of the file to download.
-- `todir` _str, optional_ - The target directory. Defaults to the `_cache` class attribute.
-  
 
-**Returns**:
+**Args:**
+ 
+ - <b>`pattern`</b> (str):  A string formatting pattern or direct glob pattern to match (e.g., "{species}_proteoform*"). 
+ - <b>`exclude`</b> (list of str, optional):  Glob patterns to exclude from the results. 
+ - <b>`**kwargs`</b>:  Format arguments injected into the `pattern` string (e.g., species="human"). 
 
-- `str` - The local filepath of the downloaded (or cached) file.
 
-<a id="glygen.GlyGenDownloader.dataframe"></a>
 
-#### dataframe
+**Returns:**
+ 
+ - <b>`list`</b>:  Alphabetically sorted list of matching filenames from the server. 
 
-```python
-def dataframe(*filenames, **kwargs)
-```
 
-High-level API to build a cleaned, processed DataFrame from a list of files.
-It provides a rich interface to apply lambdas and caching.
-
-**Arguments**:
-
-- `*filenames` _str or list_ - One or more filenames/paths to load and merge.
-- `name` _str, optional_ - A unique alias for this DataFrame construction. If provided,
-  the processed DataFrame will be saved to disk as a `.fth`
-  (Feather) cache file, speeding up future runs immensely.
-- `force` _bool, optional_ - If True, ignores the `.fth` Feather cache and reconstructs the data.
-- `usecols` _list, optional_ - Columns to extract from the source CSV.
-- `notna` _list, optional_ - Columns that must not contain NaN values (rows dropped).
-- `asint` _list, optional_ - Columns to cast as integers.
-- `setcolumn` _dict, optional_ - Static columns to inject (e.g., {"predicted": False}).
-- `transform` _dict, optional_ - Complex derivations passed as {column_name: callable(df)}.
-  (e.g. {"dstatus": lambda df: ~df["do_name"].isna()}).
-- `filterrows` _list of callables, optional_ - Condition functions to subset the data.
-- `dropcols` _list, optional_ - Columns to discard at the very end of processing.
-- `dropdups` _bool, optional_ - If True, applies DataFrame.drop_duplicates().
-- `addfilename` _bool, optional_ - If True, appends the source filename as a column.
-- `addspecies` _bool, optional_ - If True, appends the inferred species as a column.
-- `addtaxid` _bool, optional_ - If True, appends the species taxid as a column.
-  
-
-**Returns**:
-
-- `pd.DataFrame` - The finalized pandas DataFrame.
 
