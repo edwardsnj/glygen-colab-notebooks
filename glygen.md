@@ -1,3 +1,12 @@
+# Table of Contents
+
+* [glygen](#glygen)
+  * [GlyGenDownloader](#glygen.GlyGenDownloader)
+    * [\_\_init\_\_](#glygen.GlyGenDownloader.__init__)
+    * [filenames](#glygen.GlyGenDownloader.filenames)
+    * [download](#glygen.GlyGenDownloader.download)
+    * [dataframe](#glygen.GlyGenDownloader.dataframe)
+
 <a id="glygen"></a>
 
 # glygen
