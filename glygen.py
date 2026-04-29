@@ -1,3 +1,19 @@
+"""
+GlyGen Data Utilities
+
+This module provides utilities to discover, download, cache, and process 
+datasets from the GlyGen data repository (data.glygen.org). It is designed 
+specifically for data science workflows, enabling the seamless conversion of 
+remote CSV files into clean, filtered, and typed pandas DataFrames.
+
+Features include:
+- Automatic remote file discovery via glob patterns.
+- Local caching of downloaded files.
+- Memory-efficient processing using chunked reading.
+- Dynamic data transformations, filtering, and static column injections.
+- Intermediate DataFrame caching (via Feather format) for rapid reloading.
+"""
+
 import os
 import sys
 import urllib.request
