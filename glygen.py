@@ -25,7 +25,7 @@ __version__ = "1.1.0"
 
 class GlyGenDownloader(object):
     """
-    A utility to discover, download, cache, and load datasets from the GlyGen data repository 
+    A utility class to discover, download, cache, and load datasets from the GlyGen data repository 
     into pandas DataFrames seamlessly.
         
     Public Methods:
