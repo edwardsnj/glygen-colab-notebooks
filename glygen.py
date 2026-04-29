@@ -31,9 +31,8 @@ class GlyGenDownloader(object):
     """
     
     _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
-    _cache = ".glygen"
     _anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
-    
+
     _glygentaxid = {
         "human": 9606,
         "mouse": 10090,
@@ -53,20 +52,25 @@ class GlyGenDownloader(object):
         "zebrafish": 7955,
     }
 
-    def __init__(self, usecache=True, clearcache=False, maxcacheage=24*3600, verbose=True):
+    def __init__(self, verbose=True, **kwargs):
         """
         Initialize the GlyGenDownloader.
 
         Args:
-            usecache (bool): If True, avoids re-downloading files that exist in the cache directory.
-            clearcache (bool): If True, clear the cache upon initialization.
+            usecache (bool): If True, avoids re-downloading filesthat exist in the cache directory. Default: True.
+            cachedir (str): Directory for download and DataFrame cache. Default: .glygen.
+            dfcacheformat (str): Format for DataFrame cache. One of "fth" or "csv". Default: fth (Feather).
+            clearcache (bool): If True, clear the cache upon initialization. Default: False.
             maxcacheage (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
-            verbose (bool): If True, prints download progress and dataframe summaries.
+            verbose (bool): If True, prints download progress and DataFrame summaries.
         """
+        self._cache = kwargs.get("cachedir",".glygen")
+        self._dfcache_format = kwargs.get("dfcacheformat","fth")
         self.verbose = verbose
-        self.usecache = usecache
-        self.maxcacheage = maxcacheage
-        if clearcache:
+        self.usecache = kwargs.get("usecache", True)
+        self.maxcacheage = kwargs.get("maxcacheage",24*3600)
+        assert self._dfcache_format in ("fth","csv")
+        if kwargs.get("clearcache",False):
             shutil.rmtree(self._cache)
 
     def _file_size(self, filename, units=None):
@@ -232,7 +236,7 @@ class GlyGenDownloader(object):
             df = df.drop_duplicates()
             
         if self.verbose:
-            print("Constructed dataframe:\n", file=sys.stderr, flush=True)
+            print("Constructed DataFrame:\n", file=sys.stderr, flush=True)
             df.info(buf=sys.stderr)
             print(file=sys.stderr, flush=True)
             
@@ -246,9 +250,9 @@ class GlyGenDownloader(object):
         Args:
             filenames (str or list): One or more filenames/paths to load and merge.
             name (str, optional): A unique alias for this DataFrame construction. If provided, 
-                                  the processed DataFrame will be saved to disk as a `.fth` 
-                                  (Feather) cache file, speeding up future runs immensely.
-            force (bool, optional): If True, ignores the `.fth` Feather cache and reconstructs the data.
+                                  the processed DataFrame will be saved to the
+                                  cache, speeding up future runs immensely.
+            force (bool, optional): If True, ignores the cache and reconstructs the DataFrame.
             usecols (list, optional): Columns to extract from the source CSV.
             notna (list, optional): Columns that must not contain NaN values (rows dropped).
             asint (list, optional): Columns to cast as integers.
@@ -270,13 +274,18 @@ class GlyGenDownloader(object):
         
         if name is None:
             return self._dataframe(*filenames, **kwargs)
-            
-        filename = os.path.join(self._cache, f"_dataframe_{name}.fth")
-        
+
+        filename = os.path.join(self._cache, f"_dataframe_{name}.{self._dfcache_format}")
+
         if os.path.exists(filename) and self.usecache and not force:
-            print(f"Reading cached dataframe {name}...", end="", file=sys.stderr, flush=True)
-            df = pd.read_feather(filename)
-            print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+            if self.verbose:
+                print(f"Reading cached DataFrame {name}...", end="", file=sys.stderr, flush=True)
+            if self._dfcache_format == "fth":
+                df = pd.read_feather(filename)
+            elif self._dfcache_format == "csv":
+                df = pd.read_csv(filename)
+            if self.verbose:
+                print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
             if self.verbose:
                 df.info(buf=sys.stderr)
@@ -284,9 +293,14 @@ class GlyGenDownloader(object):
         else:
             df = self._dataframe(*filenames, **kwargs)
             if self.usecache:
-                print(f"Writing dataframe {name} to cache...", end="", file=sys.stderr, flush=True)
-                df.to_feather(filename)
-                print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+                if self.verbose:
+                    print(f"Writing DataFrame {name} to cache...", end="", file=sys.stderr, flush=True)
+                if self._dfcache_format == "fth":
+                    df.to_feather(filename)
+                elif self._dfcache_format == "csv":
+                    df.to_csv(filename,index=False)
+                if self.verbose:
+                    print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
         return df
 

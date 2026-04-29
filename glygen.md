@@ -36,17 +36,12 @@ A utility class to discover, download, cache, and load datasets from the GlyGen 
 into pandas DataFrames seamlessly.
 
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>constructor</kbd> `__init__`
 
 ```python
-GlyGenDownloader(
-    usecache=True,
-    clearcache=False,
-    maxcacheage=86400,
-    verbose=True
-)
+GlyGenDownloader(verbose=True, **kwargs)
 ```
 
 Initialize the GlyGenDownloader.
@@ -54,10 +49,12 @@ Initialize the GlyGenDownloader.
 
 **Args:**
 
-- <b>`usecache`</b> (bool): If True, avoids re-downloading files that exist in the cache directory.
-- <b>`clearcache`</b> (bool): If True, clear the cache upon initialization.
+- <b>`usecache`</b> (bool): If True, avoids re-downloading filesthat exist in the cache directory. Default: True.
+- <b>`cachedir`</b> (str): Directory for download and DataFrame cache. Default: .glygen.
+- <b>`dfcacheformat`</b> (str): Format for DataFrame cache. One of "fth" or "csv". Default: fth (Feather).
+- <b>`clearcache`</b> (bool): If True, clear the cache upon initialization. Default: False.
 - <b>`maxcacheage`</b> (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
-- <b>`verbose`</b> (bool): If True, prints download progress and dataframe summaries.
+- <b>`verbose`</b> (bool): If True, prints download progress and DataFrame summaries.
 
 
 
@@ -65,7 +62,7 @@ Initialize the GlyGenDownloader.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L241"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L245"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `dataframe`
 
@@ -81,9 +78,9 @@ It provides a rich interface to apply lambdas and caching.
 
 - <b>`filenames`</b> (str or list): One or more filenames/paths to load and merge.
 - <b>`name`</b> (str, optional): A unique alias for this DataFrame construction. If provided, 
-                      the processed DataFrame will be saved to disk as a `.fth` 
-                      (Feather) cache file, speeding up future runs immensely.
-- <b>`force`</b> (bool, optional): If True, ignores the `.fth` Feather cache and reconstructs the data.
+                      the processed DataFrame will be saved to the
+                      cache, speeding up future runs immensely.
+- <b>`force`</b> (bool, optional): If True, ignores the cache and reconstructs the DataFrame.
 - <b>`usecols`</b> (list, optional): Columns to extract from the source CSV.
 - <b>`notna`</b> (list, optional): Columns that must not contain NaN values (rows dropped).
 - <b>`asint`</b> (list, optional): Columns to cast as integers.
@@ -104,7 +101,7 @@ It provides a rich interface to apply lambdas and caching.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L126"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `download`
 
@@ -128,7 +125,7 @@ Downloads a specific file from the GlyGen repository to a local cache directory.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L90"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L94"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `filenames`
 

@@ -1,6 +1,8 @@
 numpy<2
 pandas<2.3
 pyarrow==14.0.2
-feather-format
+feather-format==0.4.1
 httpimport
+tqdm
+scipy<1.14
 git+https://github.com/ltan10/lazydocs.git@bugfix/module-loading-and-md-format
