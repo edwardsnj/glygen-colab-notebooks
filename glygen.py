@@ -4,14 +4,19 @@ import re
 import fnmatch
 import pandas as pd
 
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 class GlyGenDownloader:
     """
     A utility to discover, download, cache, and load datasets from the GlyGen data repository 
     into pandas DataFrames seamlessly.
     
-    Public Methods:
+    Attributes:
+        _base (str): The base URL for the GlyGen data releases.
+        _cache (str): The local directory where files will be cached.
+        _glygentaxid (dict): A private mapping of common species names to their taxonomic IDs.
+        
+    Methods:
         filenames(pattern, exclude=None, **kwargs): Retrieves a list of available filenames matching a pattern.
         download(filename, todir=None): Downloads a specific file from the repository to local cache.
         dataframe(*filenames, **kwargs): High-level API to build a cleaned, processed DataFrame from a list of files.
@@ -273,6 +278,64 @@ class GlyGenDownloader:
         return df
 
 if __name__ == "__main__":
-    ggdl = GlyGenDownloader()
-    site_files = ggdl.filenames("{species}_proteoform_glycosylation_sites_*.csv", species="human")
-    print(site_files)
+    # ---------------------------------------------------------
+    # Demonstration / Test block inspired by variants notebook
+    # ---------------------------------------------------------
+    
+    print("Initializing GlyGenDownloader...")
+    ggdl = GlyGenDownloader(verbose=True)
+    SPECIES = "human"
+
+    print(f"\n--- 1. Finding files for {SPECIES} ---")
+    
+    # UniProt files
+    uniprot_template = "{species}_proteoform_glycosylation_sites_uniprotkb.csv"
+    uniprotkb_site_files = ggdl.filenames(uniprot_template, species=SPECIES)
+    
+    # Predicted site files
+    pred_template = "{species}_proteoform_glycosylation_sites_predicted_*.csv"
+    pred_site_files = ggdl.filenames(pred_template, species=SPECIES)
+    
+    # Experimental site files (exclude the above two patterns)
+    exp_template = "{species}_proteoform_glycosylation_sites_*.csv"
+    exclude_patterns = [
+        "*_proteoform_glycosylation_sites_uniprotkb.csv",
+        "*_proteoform_glycosylation_sites_predicted_*.csv"
+    ]
+    exp_site_files = ggdl.filenames(exp_template, exclude=exclude_patterns, species=SPECIES)
+
+    print(f"Found {len(uniprotkb_site_files)} UniProtKB files.")
+    print(f"Found {len(pred_site_files)} Predicted files.")
+    print(f"Found {len(exp_site_files)} Experimental files.")
+
+    print("\n--- 2. Constructing Experimental Sites DataFrame ---")
+    # Showcasing setting static columns and casting to int
+    glyco_site_exp = ggdl.dataframe(
+        exp_site_files,
+        name="demo_glyco_site_exp",
+        usecols=["uniprotkb_canonical_ac", "start_pos", "start_aa", "glycosylation_type"],
+        notna=["uniprotkb_canonical_ac", "start_pos"],
+        asint=["start_pos"],
+        dropdups=True,
+        setcolumn={"predicted": False}
+    )
+
+    print("\n--- 3. Constructing UniProtKB Sites DataFrame ---")
+    # Showcasing lambda transformations and dropping columns dynamically
+    glyco_site_uniprotkb = ggdl.dataframe(
+        uniprotkb_site_files,
+        name="demo_glyco_site_uniprotkb",
+        usecols=["uniprotkb_canonical_ac", "start_pos", "start_aa", "glycosylation_type", "xref_key"],
+        notna=["uniprotkb_canonical_ac", "start_pos"],
+        asint=["start_pos"],
+        dropdups=True,
+        transform={
+            "predicted": lambda df: ~df["xref_key"].isin(["protein_xref_pubmed", "protein_xref_doi"])
+        },
+        dropcols=["xref_key"]
+    )
+
+    print("\n--- 4. Final Summaries ---")
+    print(f"Experimental Sites Shape: {glyco_site_exp.shape}")
+    print(f"UniProtKB Sites Shape: {glyco_site_uniprotkb.shape}")
+    print("\nDemonstration complete!")
