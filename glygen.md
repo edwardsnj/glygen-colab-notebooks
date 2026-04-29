@@ -18,7 +18,7 @@ Features include:
 
 
 ## Table of Contents
-- [`GlyGenDownloader`](./glygen.md#class-glygendownloader): A utility to discover, download, cache, and load datasets from the GlyGen data repository  into pandas DataFrames seamlessly.  Public Methods:
+- [`GlyGenDownloader`](./glygen.md#class-glygendownloader): A utility class to discover, download, cache, and load datasets from the GlyGen data repository  into pandas DataFrames seamlessly.  Public Methods:
 	- [`__init__`](./glygen.md#constructor-__init__): Initialize the GlyGenDownloader.
 	- [`dataframe`](./glygen.md#method-dataframe): High-level API to build a cleaned, processed DataFrame from a list of files.  It provides a rich interface to apply lambdas and caching.
 	- [`download`](./glygen.md#method-download): Downloads a specific file from the GlyGen repository to a local cache directory.
@@ -32,7 +32,7 @@ Features include:
 <a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L26"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `GlyGenDownloader`
-A utility to discover, download, cache, and load datasets from the GlyGen data repository 
+A utility class to discover, download, cache, and load datasets from the GlyGen data repository 
 into pandas DataFrames seamlessly.
 
 Public Methods:  
