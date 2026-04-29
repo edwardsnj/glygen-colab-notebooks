@@ -252,8 +252,8 @@ class GlyGenDownloader(object):
             notna (list, optional): Columns that must not contain NaN values (rows dropped).
             asint (list, optional): Columns to cast as integers.
             setcolumn (dict, optional): Static columns to inject (e.g., {"predicted": False}).
-            transform (dict, optional): Complex derivations passed as {column_name: callable(df)}.
-                                        (e.g. {"dstatus": lambda df: ~df["do_name"].isna()}).
+            transform (dict, optional): Complex derivations passed as {column_name: callable(df)}
+                                        e.g. {"dstatus": lambda df: ~df["do_name"].isna()}.
             filterrows (list of callables, optional): Condition functions to subset the data.
             dropcols (list, optional): Columns to discard at the very end of processing.
             dropdups (bool, optional): If True, applies DataFrame.drop_duplicates().
