@@ -21,7 +21,7 @@ Features include:
 ## GlyGenDownloader Objects
 
 ```python
-class GlyGenDownloader()
+class GlyGenDownloader(object)
 ```
 
 A utility to discover, download, cache, and load datasets from the GlyGen data repository
