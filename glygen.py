@@ -4,19 +4,14 @@ import re
 import fnmatch
 import pandas as pd
 
-__version__ = "1.1.0"
+__version__ = "1.0.3"
 
 class GlyGenDownloader:
     """
     A utility to discover, download, cache, and load datasets from the GlyGen data repository 
     into pandas DataFrames seamlessly.
-    
-    Attributes:
-        _base (str): The base URL for the GlyGen data releases.
-        _cache (str): The local directory where files will be cached.
-        _glygentaxid (dict): A private mapping of common species names to their taxonomic IDs.
         
-    Methods:
+    Public Methods:
         filenames(pattern, exclude=None, **kwargs): Retrieves a list of available filenames matching a pattern.
         download(filename, todir=None): Downloads a specific file from the repository to local cache.
         dataframe(*filenames, **kwargs): High-level API to build a cleaned, processed DataFrame from a list of files.
@@ -24,7 +19,7 @@ class GlyGenDownloader:
     
     _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
     _cache = ".glygen"
-    anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
+    _anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
     
     _glygentaxid = {
         "human": 9606,
@@ -92,7 +87,7 @@ class GlyGenDownloader:
         # Read the HTML directory listing from the GlyGen repository
         page = urllib.request.urlopen(self._base).read().decode("utf-8")
         
-        for m in self.anchorre.finditer(page):
+        for m in self._anchorre.finditer(page):
             fn = m.group(1)
             
             # Skip stat files automatically
@@ -127,7 +122,7 @@ class GlyGenDownloader:
         
         if not self.usecache or not os.path.exists(filepath):
             if self.verbose:
-                print(f"Download {filename}...", end="")
+                print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
                 
             if os.path.exists(filepath):
                 os.unlink(filepath)
@@ -135,10 +130,10 @@ class GlyGenDownloader:
             urllib.request.urlretrieve(self._base + filename, filepath)
             
             if self.verbose:
-                print(f" done ({self._file_size(filepath)}).")
+                print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
         else:
             if self.verbose:
-                print(f"Using cached {filename} ({self._file_size(filepath)}).")
+                print(f"Using cached {filename} ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
                 
         return filepath
 
@@ -219,9 +214,9 @@ class GlyGenDownloader:
             df = df.drop_duplicates()
             
         if self.verbose:
-            print("Constructed data-frame:\n")
-            df.info()
-            print()
+            print("Constructed data-frame:\n", file=sys.stderr, flush=True)
+            df.info(buf=sys.stderr)
+            print(file=sys.stderr, flush=True)
             
         return df
 
@@ -262,18 +257,18 @@ class GlyGenDownloader:
         filename = os.path.join(self._cache, f"_dataframe_{name}.fth")
         
         if os.path.exists(filename) and not force:
-            print(f"Reading cached data-frame {name}...", end="")
+            print(f"Reading cached data-frame {name}...", end="", file=sys.stderr, flush=True)
             df = pd.read_feather(filename)
-            print(f"done. ({df.shape[0]} rows)\n")
+            print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
             if self.verbose:
-                df.info()
-                print()
+                df.info(buf=sys.stderr)
+                print(file=sys.stderr, flush=True)
         else:
             df = self._dataframe(*filenames, **kwargs)
-            print(f"Writing data-frame {name} to cache...", end="")
+            print(f"Writing data-frame {name} to cache...", end="", file=sys.stderr, flush=True)
             df.to_feather(filename)
-            print(f"done. ({df.shape[0]} rows)\n")
+            print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
         return df
 
