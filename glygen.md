@@ -65,8 +65,7 @@ High-level API to build a cleaned, processed DataFrame from a list of files.  It
  - <b>`notna`</b> (list, optional):  Columns that must not contain NaN values (rows dropped). 
  - <b>`asint`</b> (list, optional):  Columns to cast as integers. 
  - <b>`setcolumn`</b> (dict, optional):  Static columns to inject (e.g., {"predicted": False}). 
- - <b>`transform`</b> (dict, optional):  Complex derivations passed as {column_name: callable(df)} 
- - <b>`e.g. {"dstatus"`</b>:  lambda df: ~df["do_name"].isna()}. 
+ - <b>`transform`</b> (dict, optional):  Complex derivations passed as {column_name: callable(df)}. (e.g. {"dstatus": lambda df: ~df["do_name"].isna()}) 
  - <b>`filterrows`</b> (list of callables, optional):  Condition functions to subset the data. 
  - <b>`dropcols`</b> (list, optional):  Columns to discard at the very end of processing. 
  - <b>`dropdups`</b> (bool, optional):  If True, applies DataFrame.drop_duplicates(). 
