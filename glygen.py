@@ -74,7 +74,8 @@ class GlyGenDownloader(object):
         self.glygen_data_version = kwargs.get("glygen_data_version","current")
         assert self._dfcache_format in ("fth","csv")
         if kwargs.get("clearcache",False):
-            shutil.rmtree(self._cache)
+            if os.path.isdir(self._cache):
+                shutil.rmtree(self._cache)
 
     def _file_size(self, filename, units=None):
         """
@@ -326,7 +327,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------
     
     print("Initializing GlyGenDownloader...")
-    ggdl = GlyGenDownloader(verbose=True)
+    ggdl = GlyGenDownloader(glygen_data_version="v-2.10.1",maxagecache=10,verbose=True)
     SPECIES = "human"
 
     print(f"\n--- 1. Finding files for {SPECIES} ---")
