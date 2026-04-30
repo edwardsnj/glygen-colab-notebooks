@@ -64,7 +64,7 @@ Initialize the GlyGenDownloader.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L300"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L303"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `dataframe`
 
@@ -118,7 +118,10 @@ Downloads a specific file from the GlyGen repository to a local cache directory.
 
 - <b>`filename`</b> (str): The name of the file to download.
 - <b>`todir`</b> (str, optional): The target directory. Defaults to the `_cache` class attribute.
-
+- <b>`filebytes`</b> (int, optional): The size in bytes expected for the file. If this value is provided 
+                           and the file in the cache does not match this value, it is 
+                           re-downloaded; if the downloaded file does not match this value, an 
+                           exception is raised; and a download progress bar is shown.
 
 **Returns:**
 

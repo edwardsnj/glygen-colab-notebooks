@@ -161,7 +161,10 @@ class GlyGenDownloader(object):
         Args:
             filename (str): The name of the file to download.
             todir (str, optional): The target directory. Defaults to the `_cache` class attribute.
-
+            filebytes (int, optional): The size in bytes expected for the file. If this value is provided 
+                                       and the file in the cache does not match this value, it is 
+                                       re-downloaded; if the downloaded file does not match this value, an 
+                                       exception is raised; and a download progress bar is shown.
         Returns:
             str: The local filepath of the downloaded (or cached) file.
         """
