@@ -104,7 +104,7 @@ class GlyGenDownloader(object):
         Args:
             pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
             exclude (list of str, optional): Glob patterns to exclude from the results.
-            **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+            kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
         Returns:
             list: Alphabetically sorted list of dictionaries with filename and filebytes keys from the server.
@@ -147,7 +147,7 @@ class GlyGenDownloader(object):
         Args:
             pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
             exclude (list of str, optional): Glob patterns to exclude from the results.
-            **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+            kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
         Returns:
             list: Alphabetically sorted list of matching filenames from the server.
