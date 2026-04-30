@@ -145,7 +145,7 @@ Retrieves list of filenames available on the GlyGen server that match a specific
 
 - <b>`pattern`</b> (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
 - <b>`exclude`</b> (list of str, optional): Glob patterns to exclude from the results.
-**kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+- <b>`kwargs`</b>: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
 
 **Returns:**
@@ -170,7 +170,7 @@ Retrieves list of dictionaties with filenames and file sizes available on the Gl
 
 - <b>`pattern`</b> (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
 - <b>`exclude`</b> (list of str, optional): Glob patterns to exclude from the results.
-**kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+- <b>`kwargs`</b>: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
 
 **Returns:**
