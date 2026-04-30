@@ -16,11 +16,13 @@ Features include:
 
 import os
 import sys
+import time
 import urllib.request
 import re
 import fnmatch
 import shutil
 import pandas as pd
+from tqdm import tqdm
 
 __version__ = "1.1.0"
 
@@ -30,8 +32,8 @@ class GlyGenDownloader(object):
     into pandas DataFrames seamlessly.
     """
     
-    _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
-    _anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
+    _base = "https://data.glygen.org/ln2data/releases/data/{VERSION}/reviewed/"
+    _anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>([^<]*)',re.MULTILINE)
 
     _glygentaxid = {
         "human": 9606,
@@ -62,6 +64,7 @@ class GlyGenDownloader(object):
             dfcacheformat (str): Format for DataFrame cache. One of "fth" or "csv". Default: fth (Feather).
             clearcache (bool): If True, clear the cache upon initialization. Default: False.
             maxcacheage (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
+            glygen_data_version (str): Release version of GlyGen data resource to retrieve datafiles from. Default: current.
             verbose (bool): If True, prints download progress and DataFrame summaries.
         """
         self._cache = kwargs.get("cachedir",".glygen")
@@ -69,9 +72,12 @@ class GlyGenDownloader(object):
         self.verbose = verbose
         self.usecache = kwargs.get("usecache", True)
         self.maxcacheage = kwargs.get("maxcacheage",24*3600)
+        self.glygen_data_version = kwargs.get("glygen_data_version","current")
+        self.tqdm_min_size = kwargs.get("tqdm_min_size",10*1024**2)
         assert self._dfcache_format in ("fth","csv")
         if kwargs.get("clearcache",False):
-            shutil.rmtree(self._cache)
+            if os.path.isdir(self._cache):
+                shutil.rmtree(self._cache)
 
     def _file_size(self, filename, units=None):
         """
@@ -91,9 +97,9 @@ class GlyGenDownloader(object):
             size_bytes /= 1024
         return f"{size_bytes:.2f} PB"
 
-    def filenames(self, pattern, exclude=None, **kwargs):
+    def listing(self, pattern, exclude=None, **kwargs):
         """
-        Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+        Retrieves list of dictionaties with filenames and file sizes available on the GlyGen server that match a specific pattern.
 
         Args:
             pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
@@ -101,16 +107,23 @@ class GlyGenDownloader(object):
             **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
         Returns:
-            list: Alphabetically sorted list of matching filenames from the server.
+            list: Alphabetically sorted list of dictionaries with filename and filebytes keys from the server.
         """
         glob_pattern = pattern.format(**kwargs)
         matched_files = []
         
         # Read the HTML directory listing from the GlyGen repository
-        page = urllib.request.urlopen(self._base).read().decode("utf-8")
+        baseurl = self._base.format(VERSION=self.glygen_data_version)
+        page = urllib.request.urlopen(baseurl).read().decode("utf-8")
         
         for m in self._anchorre.finditer(page):
             fn = m.group(1)
+            rest = m.group(3).split()
+
+            if len(rest) == 0:
+                continue
+
+            bytes = int(rest[-1])
             
             # Skip stat files automatically
             if fn.endswith('.stat.csv'):
@@ -123,11 +136,25 @@ class GlyGenDownloader(object):
             
             # Keep if the file matches our glob pattern
             if fnmatch.fnmatch(fn, glob_pattern):
-                matched_files.append(fn)
+                matched_files.append(dict(filename=fn,filebytes=bytes))
                 
-        return sorted(matched_files)
+        return sorted(matched_files,key=lambda d: d.get('filename'))
 
-    def download(self, filename, todir=None):
+    def filenames(self, pattern, exclude=None, **kwargs):
+        """
+        Retrieves list of filenames available on the GlyGen server that match a specific pattern.
+
+        Args:
+            pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
+            exclude (list of str, optional): Glob patterns to exclude from the results.
+            **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+
+        Returns:
+            list: Alphabetically sorted list of matching filenames from the server.
+        """
+        return [ d['filename'] for d in self.listing(pattern, exclude=exclude, **kwargs) ]
+
+    def download(self, filename, todir=None, filebytes=None):
         """
         Downloads a specific file from the GlyGen repository to a local cache directory.
 
@@ -142,17 +169,40 @@ class GlyGenDownloader(object):
         os.makedirs(target_dir, exist_ok=True)
         filepath = os.path.join(target_dir, filename)
         
-        if not self.usecache or not os.path.exists(filepath):
-            if self.verbose:
-                print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
-                
+        if not self.usecache or not os.path.exists(filepath) or \
+            os.path.getmtime(filepath) < (time.time()-self.maxcacheage) or \
+            (filebytes is not None and os.path.getsize(filepath) != filebytes):
+
             if os.path.exists(filepath):
                 os.unlink(filepath)
-                
-            urllib.request.urlretrieve(self._base + filename, filepath)
             
-            if self.verbose:
+            baseurl = self._base.format(VERSION=self.glygen_data_version)
+
+            if filebytes is not None and filebytes >= self.tqdm_min_size and self.verbose:
+                print(f"Download {filename}...", file=sys.stderr, flush=True)
+                with tqdm(unit='B', unit_scale=True, unit_divisor=1024, 
+                          miniters=1, desc="Download progress", ascii=True) as t:
+                    def reporthook(block_num, block_size, total_size):
+                        if total_size is not None:
+                            t.total = total_size
+                        # Update the progress bar based on the delta from the previous call
+                        t.update(block_num * block_size - t.n)
+                    urllib.request.urlretrieve(baseurl + filename, filepath, reporthook=reporthook)
+                print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
                 print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
+            else:
+                if self.verbose:
+                    print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
+                
+                urllib.request.urlretrieve(baseurl + filename, filepath)
+
+                if self.verbose:
+                    print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
+            
+            if filebytes is not None and os.path.getsize(filepath) != filebytes:
+                raise IOError(f"Downloaded file {filename} is truncated.")
+
+            
         else:
             if self.verbose:
                 print(f"Using cached {filename} ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
@@ -171,10 +221,15 @@ class GlyGenDownloader(object):
         # Handle cases where a list is passed as the first positional argument
         if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
             filenames = filenames[0]
-            
+        
+        if len(filenames) == 0:
+            raise ValueError("No files provided to build data-frame.")
+
+        listing = dict([(d['filename'],d['filebytes']) for d in self.listing("*")])
+
         for fn in filenames:
             if not os.path.exists(fn):
-                fn = self.download(fn)
+                fn = self.download(fn,filebytes=listing[fn])
                 
             # Read in chunks to manage memory footprint efficiently
             for chunk_df in pd.read_csv(fn, usecols=usecols, chunksize=100000):
@@ -275,9 +330,19 @@ class GlyGenDownloader(object):
         if name is None:
             return self._dataframe(*filenames, **kwargs)
 
+        if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
+            filenames = filenames[0]
+        maxmtime = 0; minmtime = 1e+20;
+        for f in filenames:
+            if os.path.exists(f):
+                if os.path.getmtime(f) < maxmtime:
+                    maxmtime = os.path.getmtime(f)
+                if os.path.getmtime(f) > minmtime:
+                    minmtime = os.path.getmtime(f)
+        
         filename = os.path.join(self._cache, f"_dataframe_{name}.{self._dfcache_format}")
 
-        if os.path.exists(filename) and self.usecache and not force:
+        if os.path.exists(filename) and self.usecache and not force and (min(minmtime,os.path.getmtime(filename)) > (time.time()-self.maxcacheage)) and (os.path.getmtime(filename) > maxmtime):
             if self.verbose:
                 print(f"Reading cached DataFrame {name}...", end="", file=sys.stderr, flush=True)
             if self._dfcache_format == "fth":
@@ -300,7 +365,7 @@ class GlyGenDownloader(object):
                 elif self._dfcache_format == "csv":
                     df.to_csv(filename,index=False)
                 if self.verbose:
-                    print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+                    print(f" done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
         return df
 
@@ -310,7 +375,7 @@ if __name__ == "__main__":
     # ---------------------------------------------------------
     
     print("Initializing GlyGenDownloader...")
-    ggdl = GlyGenDownloader(verbose=True)
+    ggdl = GlyGenDownloader(glygen_data_version="v-2.10.1",maxagecache=10,verbose=True)
     SPECIES = "human"
 
     print(f"\n--- 1. Finding files for {SPECIES} ---")
