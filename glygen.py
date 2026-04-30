@@ -354,7 +354,7 @@ class GlyGenDownloader(object):
                 elif self._dfcache_format == "csv":
                     df.to_csv(filename,index=False)
                 if self.verbose:
-                    print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+                    print(f" done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
             
         return df
 

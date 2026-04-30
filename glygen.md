@@ -22,21 +22,22 @@ Features include:
 	- [`__init__`](./glygen.md#constructor-__init__): Initialize the GlyGenDownloader.
 	- [`dataframe`](./glygen.md#method-dataframe): High-level API to build a cleaned, processed DataFrame from a list of files.  It provides a rich interface to apply lambdas and caching.
 	- [`download`](./glygen.md#method-download): Downloads a specific file from the GlyGen repository to a local cache directory.
-	- [`filenames`](./glygen.md#method-filenames): Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+	- [`filenames`](./glygen.md#method-filenames)
+	- [`listing`](./glygen.md#method-listing): Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
 
 
 
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L27"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L29"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ## <kbd>class</kbd> `GlyGenDownloader`
 A utility class to discover, download, cache, and load datasets from the GlyGen data repository 
 into pandas DataFrames seamlessly.
 
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L55"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L57"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>constructor</kbd> `__init__`
 
@@ -63,7 +64,7 @@ Initialize the GlyGenDownloader.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L248"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L289"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `dataframe`
 
@@ -102,12 +103,12 @@ It provides a rich interface to apply lambdas and caching.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L132"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L146"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `download`
 
 ```python
-download(filename, todir=None)
+download(filename, todir=None, filebytes=None)
 ```
 
 Downloads a specific file from the GlyGen repository to a local cache directory.
@@ -126,12 +127,25 @@ Downloads a specific file from the GlyGen repository to a local cache directory.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L96"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L143"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `filenames`
 
 ```python
 filenames(pattern, exclude=None, **kwargs)
+```
+
+
+
+
+---
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+
+### <kbd>method</kbd> `listing`
+
+```python
+listing(pattern, exclude=None, **kwargs)
 ```
 
 Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
