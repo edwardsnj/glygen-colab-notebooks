@@ -178,7 +178,10 @@ class GlyGenDownloader(object):
         # Handle cases where a list is passed as the first positional argument
         if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
             filenames = filenames[0]
-            
+        
+        if len(filenames) == 0:
+            raise ValueError("No files provided to build data-frame.")
+
         for fn in filenames:
             if not os.path.exists(fn):
                 fn = self.download(fn)
