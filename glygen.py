@@ -109,7 +109,8 @@ class GlyGenDownloader(object):
         matched_files = []
         
         # Read the HTML directory listing from the GlyGen repository
-        page = urllib.request.urlopen(self._base).read().decode("utf-8")
+        baseurl = self._base.format(VERSION=self.glygen_data_version)
+        page = urllib.request.urlopen(baseurl).read().decode("utf-8")
         
         for m in self._anchorre.finditer(page):
             fn = m.group(1)
@@ -151,8 +152,9 @@ class GlyGenDownloader(object):
                 
             if os.path.exists(filepath):
                 os.unlink(filepath)
-                
-            urllib.request.urlretrieve(self._base + filename, filepath)
+            
+            baseurl = self._base.format(VERSION=self.glygen_data_version)
+            urllib.request.urlretrieve(baseurl + filename, filepath)
             
             if self.verbose:
                 print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
