@@ -54,6 +54,7 @@ Initialize the GlyGenDownloader.
 - <b>`dfcacheformat`</b> (str): Format for DataFrame cache. One of "fth" or "csv". Default: fth (Feather).
 - <b>`clearcache`</b> (bool): If True, clear the cache upon initialization. Default: False.
 - <b>`maxcacheage`</b> (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
+- <b>`glygen_data_version`</b> (str): Release version of GlyGen data resource to retrieve datafiles from. Default: current.
 - <b>`verbose`</b> (bool): If True, prints download progress and DataFrame summaries.
 
 
@@ -62,7 +63,7 @@ Initialize the GlyGenDownloader.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L245"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L248"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `dataframe`
 
@@ -101,7 +102,7 @@ It provides a rich interface to apply lambdas and caching.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L130"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L132"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `download`
 
@@ -125,7 +126,7 @@ Downloads a specific file from the GlyGen repository to a local cache directory.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L94"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L96"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `filenames`
 

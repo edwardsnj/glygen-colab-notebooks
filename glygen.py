@@ -30,7 +30,7 @@ class GlyGenDownloader(object):
     into pandas DataFrames seamlessly.
     """
     
-    _base = "https://data.glygen.org/ln2data/releases/data/current/reviewed/"
+    _base = "https://data.glygen.org/ln2data/releases/data/{VERSION}/reviewed/"
     _anchorre = re.compile(r'<a href="([^"]*)">([^<]*)</a>')
 
     _glygentaxid = {
@@ -62,6 +62,7 @@ class GlyGenDownloader(object):
             dfcacheformat (str): Format for DataFrame cache. One of "fth" or "csv". Default: fth (Feather).
             clearcache (bool): If True, clear the cache upon initialization. Default: False.
             maxcacheage (float): Max. age of files in the cache, after which they must be re-downloaded or re-generated. In seconds. Default: 1 day.
+            glygen_data_version (str): Release version of GlyGen data resource to retrieve datafiles from. Default: current.
             verbose (bool): If True, prints download progress and DataFrame summaries.
         """
         self._cache = kwargs.get("cachedir",".glygen")
@@ -69,6 +70,7 @@ class GlyGenDownloader(object):
         self.verbose = verbose
         self.usecache = kwargs.get("usecache", True)
         self.maxcacheage = kwargs.get("maxcacheage",24*3600)
+        self.glygen_data_version = kwargs.get("glygen_data_version","current")
         assert self._dfcache_format in ("fth","csv")
         if kwargs.get("clearcache",False):
             shutil.rmtree(self._cache)
@@ -141,8 +143,9 @@ class GlyGenDownloader(object):
         target_dir = todir if todir is not None else self._cache
         os.makedirs(target_dir, exist_ok=True)
         filepath = os.path.join(target_dir, filename)
+
         
-        if not self.usecache or not os.path.exists(filepath):
+        if not self.usecache or not os.path.exists(filepath) or os.path.getmtime(filepath) < (time.time()-self.maxcacheage):
             if self.verbose:
                 print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
                 
@@ -275,9 +278,19 @@ class GlyGenDownloader(object):
         if name is None:
             return self._dataframe(*filenames, **kwargs)
 
+        if len(filenames) == 1 and isinstance(filenames[0], (list, tuple)):
+            filenames = filenames[0]
+        maxmtime = 0; minmtime = 1e+20;
+        for f in filenames:
+            if os.path.exists(f):
+                if os.path.getmtime(f) < maxmtime:
+                    maxmtime = os.path.getmtime(f)
+                if os.path.getmtime(f) > minmtime:
+                    minmtime = os.path.getmtime(f)
+        
         filename = os.path.join(self._cache, f"_dataframe_{name}.{self._dfcache_format}")
 
-        if os.path.exists(filename) and self.usecache and not force:
+        if os.path.exists(filename) and self.usecache and not force and (min(minmtime,os.path.getmtime(filename)) > (time.time()-self.maxcacheage)) and (os.path.getmtime(filename) > maxmtime):
             if self.verbose:
                 print(f"Reading cached DataFrame {name}...", end="", file=sys.stderr, flush=True)
             if self._dfcache_format == "fth":
