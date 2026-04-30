@@ -22,8 +22,8 @@ Features include:
 	- [`__init__`](./glygen.md#constructor-__init__): Initialize the GlyGenDownloader.
 	- [`dataframe`](./glygen.md#method-dataframe): High-level API to build a cleaned, processed DataFrame from a list of files.  It provides a rich interface to apply lambdas and caching.
 	- [`download`](./glygen.md#method-download): Downloads a specific file from the GlyGen repository to a local cache directory.
-	- [`filenames`](./glygen.md#method-filenames)
-	- [`listing`](./glygen.md#method-listing): Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+	- [`filenames`](./glygen.md#method-filenames): Retrieves list of filenames available on the GlyGen server that match a specific pattern.
+	- [`listing`](./glygen.md#method-listing): Retrieves list of dictionaties with filenames and file sizes available on the GlyGen server that match a specific pattern.
 
 
 
@@ -64,7 +64,7 @@ Initialize the GlyGenDownloader.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L289"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L300"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `dataframe`
 
@@ -103,7 +103,7 @@ It provides a rich interface to apply lambdas and caching.
 
 ---
 
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L146"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L157"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
 
 ### <kbd>method</kbd> `download`
 
@@ -135,20 +135,7 @@ Downloads a specific file from the GlyGen repository to a local cache directory.
 filenames(pattern, exclude=None, **kwargs)
 ```
 
-
-
-
----
-
-<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
-
-### <kbd>method</kbd> `listing`
-
-```python
-listing(pattern, exclude=None, **kwargs)
-```
-
-Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+Retrieves list of filenames available on the GlyGen server that match a specific pattern.
 
 
 **Args:**
@@ -161,6 +148,31 @@ Retrieves a list of filenames available on the GlyGen server that match a specif
 **Returns:**
 
 - <b>`list`</b>: Alphabetically sorted list of matching filenames from the server.
+
+
+---
+
+<a href="https://github.com/edwardsnj/glygen-colab-notebooks/blob/main/glygen.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square" /></a>
+
+### <kbd>method</kbd> `listing`
+
+```python
+listing(pattern, exclude=None, **kwargs)
+```
+
+Retrieves list of dictionaties with filenames and file sizes available on the GlyGen server that match a specific pattern.
+
+
+**Args:**
+
+- <b>`pattern`</b> (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
+- <b>`exclude`</b> (list of str, optional): Glob patterns to exclude from the results.
+**kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+
+
+**Returns:**
+
+- <b>`list`</b>: Alphabetically sorted list of dictionaries with filename and filebytes keys from the server.
 
 
 

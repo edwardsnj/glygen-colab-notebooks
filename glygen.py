@@ -99,7 +99,7 @@ class GlyGenDownloader(object):
 
     def listing(self, pattern, exclude=None, **kwargs):
         """
-        Retrieves a list of filenames available on the GlyGen server that match a specific pattern.
+        Retrieves list of dictionaties with filenames and file sizes available on the GlyGen server that match a specific pattern.
 
         Args:
             pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
@@ -107,7 +107,7 @@ class GlyGenDownloader(object):
             **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
 
         Returns:
-            list: Alphabetically sorted list of matching filenames from the server.
+            list: Alphabetically sorted list of dictionaries with filename and filebytes keys from the server.
         """
         glob_pattern = pattern.format(**kwargs)
         matched_files = []
@@ -141,6 +141,17 @@ class GlyGenDownloader(object):
         return sorted(matched_files,key=lambda d: d.get('filename'))
 
     def filenames(self, pattern, exclude=None, **kwargs):
+        """
+        Retrieves list of filenames available on the GlyGen server that match a specific pattern.
+
+        Args:
+            pattern (str): A string formatting pattern or direct glob pattern to match (e.g., `"{species}_proteoform*"`).
+            exclude (list of str, optional): Glob patterns to exclude from the results.
+            **kwargs: Format arguments injected into the `pattern` string (e.g., `species="human"`).
+
+        Returns:
+            list: Alphabetically sorted list of matching filenames from the server.
+        """
         return [ d['filename'] for d in self.listing(pattern, exclude=exclude, **kwargs) ]
 
     def download(self, filename, todir=None, filebytes=None):
