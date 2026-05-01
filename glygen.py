@@ -182,25 +182,26 @@ class GlyGenDownloader(object):
             baseurl = self._base.format(VERSION=self.glygen_data_version)
 
             if filebytes is not None and filebytes >= self.tqdm_min_size and self.verbose:
-                print(f"Download {filename}...", file=sys.stderr, flush=True)
+                print(f"Download {filename}...", file=sys.stdout, flush=True)
                 with tqdm(unit='B', unit_scale=True, unit_divisor=1024, 
-                          miniters=1, desc="Download progress", ascii=True) as t:
+                          miniters=1, desc="Download progress", ascii=True,
+                          file=sys.stdout) as t:
                     def reporthook(block_num, block_size, total_size):
                         if total_size is not None:
                             t.total = total_size
                         # Update the progress bar based on the delta from the previous call
                         t.update(block_num * block_size - t.n)
                     urllib.request.urlretrieve(baseurl + filename, filepath, reporthook=reporthook)
-                print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
-                print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
+                print(f"Download {filename}...", end="", file=sys.stdout, flush=True)
+                print(f" done ({self._file_size(filepath)}).", file=sys.stdout, flush=True)
             else:
                 if self.verbose:
-                    print(f"Download {filename}...", end="", file=sys.stderr, flush=True)
+                    print(f"Download {filename}...", end="", file=sys.stdout, flush=True)
                 
                 urllib.request.urlretrieve(baseurl + filename, filepath)
 
                 if self.verbose:
-                    print(f" done ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
+                    print(f" done ({self._file_size(filepath)}).", file=sys.stdout, flush=True)
             
             if filebytes is not None and os.path.getsize(filepath) != filebytes:
                 raise IOError(f"Downloaded file {filename} is truncated.")
@@ -208,7 +209,7 @@ class GlyGenDownloader(object):
             
         else:
             if self.verbose:
-                print(f"Using cached {filename} ({self._file_size(filepath)}).", file=sys.stderr, flush=True)
+                print(f"Using cached {filename} ({self._file_size(filepath)}).", file=sys.stdout, flush=True)
                 
         return filepath
 
@@ -294,9 +295,9 @@ class GlyGenDownloader(object):
             df = df.drop_duplicates()
             
         if self.verbose:
-            print("Constructed DataFrame:\n", file=sys.stderr, flush=True)
-            df.info(buf=sys.stderr)
-            print(file=sys.stderr, flush=True)
+            print("Constructed DataFrame:\n", file=sys.stdout, flush=True)
+            df.info(buf=sys.stdout)
+            print(file=sys.stdout, flush=True)
             
         return df
 
@@ -347,28 +348,28 @@ class GlyGenDownloader(object):
 
         if os.path.exists(filename) and self.usecache and not force and (min(minmtime,os.path.getmtime(filename)) > (time.time()-self.maxcacheage)) and (os.path.getmtime(filename) > maxmtime):
             if self.verbose:
-                print(f"Reading cached DataFrame {name}...", end="", file=sys.stderr, flush=True)
+                print(f"Reading cached DataFrame {name}...", end="", file=sys.stdout, flush=True)
             if self._dfcache_format == "fth":
                 df = pd.read_feather(filename)
             elif self._dfcache_format == "csv":
                 df = pd.read_csv(filename)
             if self.verbose:
-                print(f"done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+                print(f"done. ({df.shape[0]} rows)\n", file=sys.stdout, flush=True)
             
             if self.verbose:
-                df.info(buf=sys.stderr)
-                print(file=sys.stderr, flush=True)
+                df.info(buf=sys.stdout)
+                print(file=sys.stdout, flush=True)
         else:
             df = self._dataframe(*filenames, **kwargs)
             if self.usecache:
                 if self.verbose:
-                    print(f"Writing DataFrame {name} to cache...", end="", file=sys.stderr, flush=True)
+                    print(f"Writing DataFrame {name} to cache...", end="", file=sys.stdout, flush=True)
                 if self._dfcache_format == "fth":
                     df.to_feather(filename)
                 elif self._dfcache_format == "csv":
                     df.to_csv(filename,index=False)
                 if self.verbose:
-                    print(f" done. ({df.shape[0]} rows)\n", file=sys.stderr, flush=True)
+                    print(f" done. ({df.shape[0]} rows)\n", file=sys.stdout, flush=True)
             
         return df
 
