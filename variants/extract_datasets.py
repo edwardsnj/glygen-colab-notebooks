@@ -5,9 +5,9 @@ import glob
 __version__ = "1.0"
 __status__ = "Dev"
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPT_DIR   = os.path.dirname(os.path.abspath(__file__))
 REVIEWED_DIR = os.path.join(SCRIPT_DIR, "reviewed")
-SPECIES = "human"
+SPECIES      = "human"
 
 
 def extract_glyco_sites():
@@ -16,11 +16,8 @@ def extract_glyco_sites():
 
     out_file_exp  = os.path.join(data_dir, "human_glycosites_experimental.csv")
     out_file_pred = os.path.join(data_dir, "human_glycosites_predicted.csv")
-    FW_exp  = open(out_file_exp, "w")
-    FW_pred = open(out_file_pred, "w")
+
     header = ["uniprot_canonical_ac", "start_pos", "start_aa", "gtype"]
-    FW_exp.write("\"%s\"\n"  % ("\",\"".join(header)))
-    FW_pred.write("\"%s\"\n" % ("\",\"".join(header)))
 
     tmp_dict_exp  = {}
     tmp_dict_pred = {}
@@ -58,24 +55,25 @@ def extract_glyco_sites():
                 g_type    = row[f_list.index("glycosylation_type")]
                 if canon == "" or start_pos == "":
                     continue
-                site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
+                # use protein + position as the key for cross-dataset comparison
+                pos_key = "%s:%s:%s" % (canon, start_pos, g_type)
+                site    = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
                 if is_predicted:
                     if site not in tmp_dict_pred:
-                        newrow = [canon, str(start_pos), start_aa, g_type]
-                        FW_pred.write("\"%s\"\n" % ("\",\"".join(newrow)))
-                    tmp_dict_pred[site] = True
+                        tmp_dict_pred[site] = {
+                            "row": [canon, str(start_pos), start_aa, g_type],
+                            "pos_key": pos_key
+                        }
                 else:
                     if site not in tmp_dict_exp:
-                        newrow = [canon, str(start_pos), start_aa, g_type]
-                        FW_exp.write("\"%s\"\n" % ("\",\"".join(newrow)))
-                    tmp_dict_exp[site] = True
-    print("Experimental sites found:",len(tmp_dict_exp))
-    print("Predicted sites found:",len(tmp_dict_pred))
+                        tmp_dict_exp[site] = {
+                            "row": [canon, str(start_pos), start_aa, g_type],
+                            "pos_key": pos_key
+                        }
 
     # ── UniProtKB file: first pass to find experimentally supported sites ─────
     print("\n=== UNIPROTKB FILE ===")
     uniprotkb_exp_sites = set()
-    uniprotkb_pred_sites = set()
     if os.path.exists(uniprotkb_file):
         print("FOUND: %s" % uniprotkb_file)
         with open(uniprotkb_file, "r") as FR:
@@ -96,14 +94,8 @@ def extract_glyco_sites():
                 if xref_key.find("_xref_pubmed") != -1 or xref_key.find("_xref_doi") != -1:
                     site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
                     uniprotkb_exp_sites.add(site)
-                else:
-                    site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
-                    uniprotkb_pred_sites.add(site)
-        
         print("UniProtKB experimental sites found: %s" % len(uniprotkb_exp_sites))
 
-        num_uniprotkb_exp_sites = 0
-        num_uniprotkb_pred_sites = 0
         # ── UniProtKB file: second pass to write to exp or pred ──────────────
         with open(uniprotkb_file, "r") as FR:
             f_list, idx = [], 0
@@ -119,30 +111,60 @@ def extract_glyco_sites():
                 g_type    = row[f_list.index("glycosylation_type")]
                 if canon == "" or start_pos == "":
                     continue
-                site = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
+                pos_key = "%s:%s:%s" % (canon, start_pos, g_type)
+                site    = "%s:%s:%s:%s" % (canon, start_pos, start_aa, g_type)
                 if site in uniprotkb_exp_sites:
                     if site not in tmp_dict_exp:
-                        newrow = [canon, str(start_pos), start_aa, g_type]
-                        FW_exp.write("\"%s\"\n" % ("\",\"".join(newrow)))
-                        num_uniprotkb_exp_sites += 1
-                    tmp_dict_exp[site] = True
+                        tmp_dict_exp[site] = {
+                            "row": [canon, str(start_pos), start_aa, g_type],
+                            "pos_key": pos_key
+                        }
                 else:
                     if site not in tmp_dict_pred:
-                        newrow = [canon, str(start_pos), start_aa, g_type]
-                        FW_pred.write("\"%s\"\n" % ("\",\"".join(newrow)))
-                        num_uniprotkb_pred_sites += 1
-                    tmp_dict_pred[site] = True
+                        tmp_dict_pred[site] = {
+                            "row": [canon, str(start_pos), start_aa, g_type],
+                            "pos_key": pos_key
+                        }
     else:
         print("NOT FOUND: %s" % uniprotkb_file)
 
-    print("\n=== SUMMARY ===")
-    print("UniProtKB experimental sites written: %s" % num_uniprotkb_exp_sites)
-    print("UniProtKB predicted sites written: %s" % num_uniprotkb_pred_sites)
-    print("Total experimental sites written: %s" % len(tmp_dict_exp))
-    print("Total predicted sites written: %s" % len(tmp_dict_pred))
+    # ── Remove predicted sites that appear as experimental ───────────────────
+    print("\n=== CROSS-DATASET FILTERING ===")
 
+    # build a set of all experimental pos_keys (protein + position + gtype)
+    exp_pos_keys = set(tmp_dict_exp[site]["pos_key"] for site in tmp_dict_exp)
+
+    # filter predicted sites — remove any whose pos_key matches an experimental site
+    filtered_pred = {}
+    removed_count = 0
+    for site in tmp_dict_pred:
+        pos_key = tmp_dict_pred[site]["pos_key"]
+        if pos_key in exp_pos_keys:
+            removed_count += 1
+        else:
+            filtered_pred[site] = tmp_dict_pred[site]
+
+    print("Predicted sites removed (found in experimental): %d" % removed_count)
+    print("Predicted sites remaining: %d" % len(filtered_pred))
+
+    # ── Write experimental sites ──────────────────────────────────────────────
+    FW_exp = open(out_file_exp, "w")
+    FW_exp.write("\"%s\"\n" % ("\",\"".join(header)))
+    for site in tmp_dict_exp:
+        FW_exp.write("\"%s\"\n" % ("\",\"".join(tmp_dict_exp[site]["row"])))
     FW_exp.close()
+
+    # ── Write filtered predicted sites ───────────────────────────────────────
+    FW_pred = open(out_file_pred, "w")
+    FW_pred.write("\"%s\"\n" % ("\",\"".join(header)))
+    for site in filtered_pred:
+        FW_pred.write("\"%s\"\n" % ("\",\"".join(filtered_pred[site]["row"])))
     FW_pred.close()
+
+    print("\n=== SUMMARY ===")
+    print("Total experimental sites written: %d" % len(tmp_dict_exp))
+    print("Total predicted sites written:    %d" % len(filtered_pred))
+
     return
 
 
@@ -159,11 +181,8 @@ def extract_variants():
     FW.write("\"%s\"\n" % ("\",\"".join(newrow)))
     tmp_dict = {}
     for in_file in file_list:
-        is_cancer = in_file.find("cancer") != -1
-        if is_cancer:
-            variant_type = "somatic_cancer"
-        else:
-            variant_type = "germline"
+        is_cancer    = in_file.find("cancer") != -1
+        variant_type = "somatic_cancer" if is_cancer else "germline"
         with open(in_file, "r") as FR:
             f_list, idx = [], 0
             for line in FR:
@@ -193,6 +212,8 @@ def extract_variants():
                         FW.write("\"%s\"\n" % ("\",\"".join(newrow)))
                     tmp_dict[site] = True
     FW.close()
+    print("\n=== SUMMARY ===")
+    print("Total missense variants written: %d" % len(tmp_dict))
     return
 
 
@@ -209,8 +230,9 @@ def main():
 
     global log_file
     global data_dir
-   
+
     data_dir = os.path.join(SCRIPT_DIR, "data")
+    os.makedirs(data_dir, exist_ok=True)
 
     if options.dataset == "glycosites":
         extract_glyco_sites()
