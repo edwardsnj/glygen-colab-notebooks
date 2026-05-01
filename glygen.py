@@ -184,7 +184,8 @@ class GlyGenDownloader(object):
             if filebytes is not None and filebytes >= self.tqdm_min_size and self.verbose:
                 print(f"Download {filename}...", file=sys.stdout, flush=True)
                 with tqdm(unit='B', unit_scale=True, unit_divisor=1024, 
-                          miniters=1, desc="Download progress", ascii=True) as t:
+                          miniters=1, desc="Download progress", ascii=True,
+                          file=sys.stdout) as t:
                     def reporthook(block_num, block_size, total_size):
                         if total_size is not None:
                             t.total = total_size
